@@ -1,7 +1,9 @@
-export default function page() {
+import AuthForm from "@/app/_components/auth/AuthForm";
+
+export default function Page() {
   return (
     <div>
-       page
+       <AuthForm type="sign-up"/>
     </div>
   );
 }
