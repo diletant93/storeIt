@@ -1,3 +1,4 @@
+"use server"
 import {  Account, Avatars, Client, Databases, Storage } from "node-appwrite"
 import { appwriteConfig } from "./config"
 import { cookies } from "next/headers"
@@ -18,12 +19,6 @@ export const createSessionClient = async function(){
         get databases(){
             return new Databases(client)
         },
-        get storage(){
-            return new Storage(client)
-        },
-        get avarats(){
-            return new Avatars(client)
-        }
     }
 }
 
@@ -38,6 +33,12 @@ export const createAdminClient = async function(){
         },
         get databases(){
             return new Databases(client)
+        },
+        get storage(){
+            return new Storage(client)
+        },
+        get avarats(){
+            return new Avatars(client)
         }
     }
 }
