@@ -15,8 +15,8 @@ import { Input } from "@/components_shadcn/ui/input"
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FormTypeProp } from "@/app/_types/props";
-import { getAuthFormValidationScheme } from "@/app/_lib/validation";
+import { FormTypeProp } from "@/types/props";
+import { getAuthFormValidationScheme } from "@/lib/validation";
 
 const schema = z.object({
   fullName: z.string().min(2, { message: 'aluea ulie' }),
@@ -55,7 +55,7 @@ export default function page({ type }: { type: FormTypeProp }) {
                       <Input placeholder="Enter your full name" className="shad-input" {...field} />
                     </FormControl>
                   </div>
-                    <FormMessage className="shad-form-message" />
+                  <FormMessage className="shad-form-message" />
                 </FormItem>
               )}
             />}
@@ -70,7 +70,7 @@ export default function page({ type }: { type: FormTypeProp }) {
                     <Input placeholder="Enter your email" className="shad-input" {...field} />
                   </FormControl>
                 </div>
-                  <FormMessage className="shad-form-message" />
+                <FormMessage className="shad-form-message" />
               </FormItem>
             )}
           />

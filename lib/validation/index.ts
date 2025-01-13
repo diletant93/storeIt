@@ -1,4 +1,4 @@
-import { FormTypeProp } from '@/app/_types/props';
+import { FormTypeProp } from '@/types/props';
 import { z } from 'zod';
 export const getAuthFormValidationScheme = function (formType: FormTypeProp) {
   return z.object({
