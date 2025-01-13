@@ -1,0 +1,1 @@
+export type FormTypeProp = 'sign-in' | 'sign-up'
