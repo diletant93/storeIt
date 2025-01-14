@@ -17,3 +17,8 @@ export interface NavItemProp{
     url:string;
     active?:boolean
   }
+  export interface SidebarProps{
+    fullName:string;
+    avatar:string;
+    email:string;
+  }

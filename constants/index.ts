@@ -82,3 +82,4 @@ export const navItems = [
   ];
   
   export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+  export const AVATAR_PLACEHOLDER_PATH = '/assets/images/avatar.png'

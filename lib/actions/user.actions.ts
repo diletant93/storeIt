@@ -1,12 +1,12 @@
 'use server';
 
 import { createAccountType, SecretCodeType } from '@/types/types';
-import { createAdminClient } from '../appwrite';
+import { createAdminClient, createSessionClient } from '../appwrite';
 import { appwriteConfig } from '../appwrite/config';
 import { Query, ID } from 'node-appwrite';
 import { handleError, parseStringify } from '../utils';
 import { cookies } from 'next/headers';
-import { strict } from 'assert';
+import { AVATAR_PLACEHOLDER_PATH } from '@/constants';
 
 async function getUserByEmail(email: string) {
   try {
@@ -47,7 +47,7 @@ export async function createAccount({ fullName, email }: createAccountType) {
       {
         fullName,
         email,
-        avatar: '/assets/images/avatar.png',
+        avatar: AVATAR_PLACEHOLDER_PATH,
         accountId,
       },
     );
@@ -70,6 +70,23 @@ export async function verifySecretCode({
       secure: true,
     });
 
-    return parseStringify({sessionId:session.$id})
+    return parseStringify({ sessionId: session.$id });
   } catch (error) {}
+}
+
+export async function getCurrentUser() {
+  try {
+    const { databases, account } = await createSessionClient();
+    const result = await account.get();
+    const user = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersColectionId,
+      [Query.equal('accountId', result.$id)],
+    );
+    console.log(user.total)
+    if (user.total <= 0) return null;
+    return parseStringify(user.documents[0]);
+  } catch (error) {
+    handleError(error, 'Could not get the current user');
+  }
 }
