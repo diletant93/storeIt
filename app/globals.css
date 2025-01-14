@@ -106,7 +106,7 @@
     @apply button rounded-full bg-brand transition-all hover:bg-brand-100 !important;
   }
   .flex-center {
-    @apply flex items-center justify-center;    
+    @apply flex items-center justify-center;
   }
 
   /* =====  SHADCN OVERRIDES */
@@ -277,7 +277,13 @@
   .error-message {
     @apply body-2 mx-auto w-fit rounded-xl bg-error/5 px-8 py-4 text-center text-error !important;
   }
-
+  /*Modal*/
+  .overlay{
+    @apply fixed inset-0 w-full h-dvh flex justify-center items-center backdrop-blur-md
+  }
+  .window{
+    @apply max-w-[700px] max-h-[700px] rounded-md p-5 bg-slate-400 border border-black relative
+  }
   /* Card */
   .file-card {
     @apply flex cursor-pointer flex-col gap-6 rounded-[18px] bg-white p-5 shadow-sm transition-all hover:shadow-drop-3 !important;
