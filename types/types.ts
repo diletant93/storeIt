@@ -15,3 +15,7 @@ export interface WindowModalType{
     name:string;
     children:React.ReactNode;
 }
+export interface SecretCodeType{
+  accountId:string;
+  password:string;
+}

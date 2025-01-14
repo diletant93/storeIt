@@ -18,7 +18,7 @@ import Link from "next/link";
 import { FormTypeProp } from "@/types/props";
 import { getAuthFormValidationScheme } from "@/lib/validation";
 import { createAccount } from "@/lib/actions/user.actions";
-import OTPForm from "./OTPForm";
+import OTPModal from "./OTPModal";
 
 const schema = z.object({
   fullName: z.string().min(2, { message: 'aluea ulie' }),
@@ -28,7 +28,7 @@ const schema = z.object({
 export default function page({ type }: { type: FormTypeProp }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const [accountId, setAccountId] = useState(null)
+  const [accountId, setAccountId] = useState<string>('')
   const authScheme = getAuthFormValidationScheme(type)
   const form = useForm<z.infer<typeof authScheme>>({
     resolver: zodResolver(schema),
@@ -45,7 +45,7 @@ export default function page({ type }: { type: FormTypeProp }) {
         fullName: values.fullName || '',
         email: values.email
       })
-      setAccountId(user.accountId)
+       setAccountId(user.accountId)
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrorMessage(error.message)
@@ -123,7 +123,7 @@ export default function page({ type }: { type: FormTypeProp }) {
           </form>
         </Form>
         {accountId && (
-            <OTPForm email={form.getValues('email')} accountId={accountId}/>
+            <OTPModal email={form.getValues('email')} accountId={accountId}/>
         )}
 
     </>
