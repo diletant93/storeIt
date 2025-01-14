@@ -11,3 +11,9 @@ export type OTPFormProps ={
     password:string;
     setPassword:React.Dispatch<React.SetStateAction<string>>
 }
+export interface NavItemProp{
+    name:string;
+    icon:string;
+    url:string;
+    active?:boolean
+  }
