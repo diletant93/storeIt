@@ -2,6 +2,7 @@ import { Button } from "@/components_shadcn/ui/button";
 import Image from "next/image";
 import Search from "./Search";
 import FileUploader from "./FileUploader";
+import SignOutButton from "../elements/SignOutButton";
 
 export default function Header() {
   return (
@@ -10,9 +11,7 @@ export default function Header() {
        <div className="header-wrapper">
             <FileUploader/>
             <form>
-                <Button type='submit' className="sign-out-button">
-                    <Image src='/assets/icons/logout.svg' alt='logo' width={24} height={24} className="w-6 -translate-x-[1px]"/>
-                </Button>
+               <SignOutButton/>
             </form>
        </div>
     </header>

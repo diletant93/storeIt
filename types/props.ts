@@ -22,3 +22,7 @@ export interface NavItemProp{
     avatar:string;
     email:string;
   }
+  export interface MobileNavigationProps{
+    ownerId:string;
+    accountId:string;
+  }
