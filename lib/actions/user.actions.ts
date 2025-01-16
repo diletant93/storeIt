@@ -6,7 +6,8 @@ import { appwriteConfig } from '../appwrite/config';
 import { Query, ID } from 'node-appwrite';
 import { handleError, parseStringify } from '../utils';
 import { cookies } from 'next/headers';
-import { AVATAR_PLACEHOLDER_PATH } from '@/constants';
+import { AVATAR_PLACEHOLDER_PATH, SESSION_NAME } from '@/constants';
+import { redirect } from 'next/navigation';
 
 async function getUserByEmail(email: string) {
   try {
@@ -34,24 +35,25 @@ export async function createAccount({ fullName, email }: createAccountType) {
   if (!fullName || !email) throw new Error('No fullname or email was provided');
 
   const existingUser = await getUserByEmail(email);
+  if (existingUser)
+    handleError(new Error('User already exists'), 'User already exists');
 
   const accountId = await sendEmailOTP({ email });
   if (!accountId)
     handleError(new Error('could not send an OTP'), 'could not send an OTP');
-  if (!existingUser) {
-    const { databases } = await createAdminClient();
-    const createdUser = await databases.createDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.usersColectionId,
-      ID.unique(),
-      {
-        fullName,
-        email,
-        avatar: AVATAR_PLACEHOLDER_PATH,
-        accountId,
-      },
-    );
-  }
+
+  const { databases } = await createAdminClient();
+  const createdUser = await databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.usersColectionId,
+    ID.unique(),
+    {
+      fullName,
+      email,
+      avatar: AVATAR_PLACEHOLDER_PATH,
+      accountId,
+    },
+  );
   return parseStringify({ accountId });
 }
 
@@ -63,7 +65,7 @@ export async function verifySecretCode({
     const { account } = await createAdminClient();
     const session = await account.createSession(accountId, password);
 
-    (await cookies()).set('appwrite-session', session.secret, {
+    (await cookies()).set(SESSION_NAME, session.secret, {
       path: '/',
       httpOnly: true,
       sameSite: 'strict',
@@ -83,10 +85,35 @@ export async function getCurrentUser() {
       appwriteConfig.usersColectionId,
       [Query.equal('accountId', result.$id)],
     );
-    console.log(user.total)
+    console.log(user.total);
     if (user.total <= 0) return null;
     return parseStringify(user.documents[0]);
   } catch (error) {
     handleError(error, 'Could not get the current user');
+  }
+}
+
+export async function signOut() {
+  try {
+    const { account } = await createSessionClient();
+    await account.deleteSession('current');
+    const cookieStore = await cookies();
+    cookieStore.delete(SESSION_NAME);
+  } catch (error) {
+    handleError(error, 'Could not sign out');
+  } finally {
+    return redirect('/sign-in');
+  }
+}
+
+export async function signIn({ email }: { email: string }) {
+  try {
+    const existingUser = await getUserByEmail(email);
+    if (!existingUser)
+      return parseStringify({ accountId: null, error: 'User was not found' });
+    await sendEmailOTP({ email });
+    return parseStringify({ accountId: existingUser.accountId });
+  } catch (error) {
+    handleError(error, 'Could not sign in');
   }
 }

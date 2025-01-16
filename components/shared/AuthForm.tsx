@@ -16,36 +16,44 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FormTypeProp } from "@/types/props";
-import { getAuthFormValidationScheme } from "@/lib/validation";
-import { createAccount } from "@/lib/actions/user.actions";
+import { AuthFormType, getAuthFormValidationScheme } from "@/lib/validation";
+import { createAccount, signIn } from "@/lib/actions/user.actions";
 import OTPModal from "./OTPModal";
 
-const schema = z.object({
-  fullName: z.string().min(2, { message: 'aluea ulie' }),
-  email: z.string().email({ message: 'Provide a correct email' })
-})
 
 export default function page({ type }: { type: FormTypeProp }) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [accountId, setAccountId] = useState<string>('')
+
   const authScheme = getAuthFormValidationScheme(type)
-  const form = useForm<z.infer<typeof authScheme>>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      fullName: '',
-      email: '',
-    }
+  const defaultValues = type === 'sign-up' ? { fullName: '', email: '' } : { email: '' }
+
+  console.log(defaultValues)
+  const form = useForm<AuthFormType>({
+    resolver: zodResolver(authScheme),
+    defaultValues:defaultValues as z.infer<typeof authScheme>,
+    mode:'onChange'
   })
   async function onSubmit(values: z.infer<typeof authScheme>) {
+    console.log('submitted', values)
     setIsLoading(true)
     setErrorMessage('')
     try {
-      const user = await createAccount({
-        fullName: values.fullName || '',
-        email: values.email
-      })
-       setAccountId(user.accountId)
+      let user : {accountId:string} | null = null;
+      
+      if('fullName' in values){
+         user = await createAccount({
+          fullName: (values.fullName) as string || '',
+          email: values.email
+        })
+      }else{
+         user = await signIn({email:values.email})
+      }
+
+      if(user){
+        setAccountId(user.accountId)
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         setErrorMessage(error.message)
@@ -94,7 +102,7 @@ export default function page({ type }: { type: FormTypeProp }) {
                 </FormItem>
               )}
             />
-              <Button type="submit" className="form-submit-button" disabled={isLoading}>
+              <Button type="submit" className="form-submit-button" disabled={isLoading} onClick={()=>{console.log('clicked')}} >
                 {isLoading && (
                   <Image
                     src='/assets/icons/loader.svg'

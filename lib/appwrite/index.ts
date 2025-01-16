@@ -3,13 +3,14 @@ import {  Account, Avatars, Client, Databases, Storage } from "node-appwrite"
 import { appwriteConfig } from "./config"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { SESSION_NAME } from "@/constants"
 
 export const createSessionClient = async function(){
     const client = new Client()
     client.setEndpoint(appwriteConfig.endpointUrl)
     client.setProject(appwriteConfig.projectId)
 
-    const session = (await cookies()).get('appwrite-session')
+    const session = (await cookies()).get(SESSION_NAME)
     if(!session || !session.value) redirect('/sign-up')
 
     client.setSession(session.value)
