@@ -25,7 +25,7 @@ async function getUserByEmail(email: string) {
 export async function sendEmailOTP({ email }: { email: string }) {
   try {
     const { account } = await createAdminClient();
-    const session = await account.createEmailToken(ID.unique(), email);
+    const session = await account.createEmailToken(ID.unique(), email); // checks if client with such an email exists and if not creates one , if it does it sends an error
     return session.userId;
   } catch (error) {
     handleError(error, 'could not send email OTP');
