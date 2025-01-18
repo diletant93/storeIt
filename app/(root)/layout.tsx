@@ -14,7 +14,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
             <Sidebar {...currentUser}/>
             <section className="h-full flex flex-1 flex-col">
                 <MobileNavigation {...currentUser} />
-                <Header />
+                <Header accountId={currentUser.accountId} ownerId={currentUser.$id}/>
                 <div className="main-content">
                     {children}
                 </div>

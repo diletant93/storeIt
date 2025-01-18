@@ -4,13 +4,14 @@ import Search from "./Search";
 import FileUploader from "./FileUploader";
 import SignOutButton from "../elements/SignOutButton";
 import { signOut } from "@/lib/actions/user.actions";
+import { HeaderProps } from "@/types/props";
 
-export default function Header() {
+export default function Header({accountId, ownerId}:HeaderProps) {
   return (
     <header className="header">
        <Search/>
        <div className="header-wrapper">
-            <FileUploader/>
+            <FileUploader accountId={accountId} ownerId={ownerId}/>
             <form action={async() =>{
               "use server"
               await signOut()

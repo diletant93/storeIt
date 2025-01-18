@@ -23,9 +23,10 @@ export interface SidebarProps {
   email: string;
 }
 export interface MobileNavigationProps {
-  ownerId: string;
+  $id: string;
   accountId: string;
 }
+export type MobileMenuProps = SidebarProps & MobileNavigationProps
 
 export interface FileUploaderProps {
   ownerId: string;
@@ -53,4 +54,9 @@ export interface FileListProps {
     e: React.MouseEvent<HTMLImageElement>,
     fileName: string,
   ) => void;
+}
+
+export interface HeaderProps{
+  accountId: string;
+  ownerId:string;
 }

@@ -85,7 +85,6 @@ export async function getCurrentUser() {
       appwriteConfig.usersColectionId,
       [Query.equal('accountId', result.$id)],
     );
-    console.log(user.total);
     if (user.total <= 0) return null;
     return parseStringify(user.documents[0]);
   } catch (error) {

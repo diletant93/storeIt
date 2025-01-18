@@ -20,3 +20,10 @@ export interface SecretCodeType{
   password:string;
 }
 
+
+export interface UploadFileType{
+  file:File;
+  ownerId:string;
+  accountId:string;
+  path:string;
+}

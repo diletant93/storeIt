@@ -1,23 +1,46 @@
 "use client"
 import { Button } from '@/components_shadcn/ui/button'
-import { cn, convertFileToUrl, getFileType } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { FileUploaderProps } from '@/types/props'
 import Image from 'next/image'
 import React, {useCallback, useState} from 'react'
 import {useDropzone} from 'react-dropzone'
-import Thumbnail from '../elements/Thumbnail'
-import UploadingFilePreview from '../elements/UploadingFilePreview'
-import FileItem from '../elements/FileItem'
 import FileList from '../elements/FileList'
+import { MAX_FILE_SIZE } from '@/constants'
+import { useToast } from '@/hooks/use-toast'
+import { uploadFile } from '@/lib/actions/file.actions'
+import { usePathname } from 'next/navigation'
+import { Models } from 'node-appwrite'
 
 export default function FileUploader({ownerId,accountId,className}:FileUploaderProps) {
   const [files,setFiles] = useState<File[]>([])
-
+  const {toast} = useToast()
+  const pathname = usePathname()
   const onDrop = useCallback(async (acceptedFiles:File[]) => {
     setFiles(acceptedFiles)
+    const uploadPromises = acceptedFiles.map(async(file)=>{
+      if(file.size > MAX_FILE_SIZE){
+        setFiles(cur => cur.filter(curFile => curFile.name !== file.name)) 
+        console.log('inside oversize')
+        return toast({description:(<p className='body-2 text-white'>
+          <span className='font-semibold'>
+            {file.name}{' '}
+          </span>
+           is too large. Max file size is 50
+        </p>),
+        className:'error-toast'})
+      }
+      return uploadFile({file, ownerId, accountId, path:pathname })
+      .then((uploadedFile:Models.Document)=>{
+        if(uploadedFile){
+          setFiles(cur => cur.filter(file => file.name !== uploadedFile.name))
+        }
+      })
+    })
+    await Promise.all(uploadPromises)
     // Do something with the files
-  }, [])
-  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
+  }, [ownerId,accountId,pathname])
+  const {getRootProps, getInputProps} = useDropzone({onDrop})
   function handleRemoveFile(e:React.MouseEvent<HTMLImageElement>, fileName: string){
     e.stopPropagation()
     setFiles(currentFiles => currentFiles.filter(file => file.name !== fileName))
@@ -30,11 +53,6 @@ export default function FileUploader({ownerId,accountId,className}:FileUploaderP
         <p>Upload</p>
       </Button>
       <FileList files={files} onRemoveFile={handleRemoveFile}/>
-      {
-        isDragActive ?
-          <p>Drop the files here ...</p> :
-          <p>Drag 'n' drop some files here, or click to select files</p>
-      }
     </div>
   )
 }

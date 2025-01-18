@@ -7,14 +7,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components_shadcn/ui/sheet"
-import { SidebarProps } from "@/types/props";
+import { MobileMenuProps, SidebarProps } from "@/types/props";
 import { Separator } from "@radix-ui/react-separator";
 import Image from "next/image";
 import { useState } from "react";
 import MobileNavBar from "./MobileNavBar";
 import SignOutButton from "./SignOutButton";
 import FileUploader from "../shared/FileUploader";
-export default function MobileMenu({avatar, fullName,email}: SidebarProps) {
+export default function MobileMenu({avatar, fullName,email, $id:ownerId, accountId}: MobileMenuProps) {
     const [open,setOpen] = useState<boolean>(false)
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -41,7 +41,7 @@ export default function MobileMenu({avatar, fullName,email}: SidebarProps) {
             <MobileNavBar/>
             <Separator className="my-5 bg-light-200/20"/>
             <div className="flex flex-col justify-between pag-5 pb-5">
-              <FileUploader/>
+              <FileUploader ownerId={ownerId} accountId={accountId}/>
               <SignOutButton device='mobile'/>
             </div>
         </SheetContent>
