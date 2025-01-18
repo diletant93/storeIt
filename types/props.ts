@@ -33,10 +33,24 @@ export interface FileUploaderProps {
   className?: string;
 }
 
-export interface ThumbnailProps{
-  type:string;
-  extension:string;
-  imageClassName?:string;
-  className?:string;
-  url?:string;
+export interface ThumbnailProps {
+  type: string;
+  extension: string;
+  imageClassName?: string;
+  className?: string;
+  url?: string;
+}
+export interface FileItemProps {
+  file: File;
+  onRemoveFile: (
+    e: React.MouseEvent<HTMLImageElement>,
+    fileName: string,
+  ) => void;
+}
+export interface FileListProps {
+  files: File[];
+  onRemoveFile: (
+    e: React.MouseEvent<HTMLImageElement>,
+    fileName: string,
+  ) => void;
 }
