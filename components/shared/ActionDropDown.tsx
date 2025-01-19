@@ -32,18 +32,15 @@ import { useToast } from "@/hooks/use-toast";
 import useErrorToast from "@/hooks/useErrorToast";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 
-export default async function ActionDropDown({ file }: { file: IFileType }) {
-    async function getInitialState(){
-        const currentUser = await getCurrentUser()
-        const currentUserEmail = currentUser!.email
+export default function ActionDropDown({ file }: { file: IFileType }) {
+    function getInitialState() {
         const initialState = {
             ...INITIAL_STATE,
             name: file.name.replace(EXTENSIONS, ''),
-            currentUserEmail
         }
         return initialState
     }
-    const { state, dispatch } = useActionDropDown(await getInitialState())
+    const { state, dispatch } = useActionDropDown(getInitialState())
     const { toastError } = useErrorToast()
     const pathname = usePathname()
 
@@ -56,25 +53,17 @@ export default async function ActionDropDown({ file }: { file: IFileType }) {
     }
 
     function handleCloseAllModals() {
-        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name, currentUserEmail: state.currentUserEmail } })
+        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name} })
     }
 
     async function handleRemoveUser(email: string) {
-        dispatch({type:'SET_IS_LOADING', payload:true})
+        dispatch({ type: 'SET_IS_LOADING', payload: true })
         dispatch({ type: 'REMOVE_EMAIL', payload: email })
         await updateFileUsers({ fileId: file.$id, emails: state.emails, path: pathname })
-        dispatch({type:'SET_IS_LOADING', payload:false})
+        dispatch({ type: 'SET_IS_LOADING', payload: false })
     }
-    async function handleInputEmail(emails:string[]){
-        try {
-            dispatch({ type: 'SET_EMAILS', payload: emails })
-        } catch (error) {
-            if (error instanceof Error) {
-                console.log('inside the toasts')
-                return toastError({ message: error.message })
-            }
-            return toastError({ message: 'Something went wrong' })
-        }
+    async function handleInputEmail(emails: string[]) {
+        dispatch({ type: 'SET_EMAILS', payload: emails })
     }
     async function handleActions() {
         if (!state.action) return
@@ -112,7 +101,7 @@ export default async function ActionDropDown({ file }: { file: IFileType }) {
                     {value === 'details' && <FileDetails file={file} />}
                     {value === 'share' && <ShareInput
                         file={file}
-                        onInputChange={(emails: string[]) => { handleInputEmail(emails)  }}
+                        onInputChange={(emails: string[]) => { handleInputEmail(emails) }}
                         onRemove={handleRemoveUser} />}
                 </DialogHeader>
                 {renameDeleteShare.includes(value) && (

@@ -7,7 +7,7 @@ export const INITIAL_STATE = {
   action: null,
   name: '',
   isLoading: false,
-  emails:[]
+  emails: []
 }
 function reducer(state: ActionDropDownStateType, action: ActionDropDownActions): ActionDropDownStateType {
   switch (action.type) {
@@ -39,21 +39,15 @@ function reducer(state: ActionDropDownStateType, action: ActionDropDownActions):
     case 'SET_TO_INITIAL_STATE':
       return action.payload
     case "SET_EMAILS":
-      if(action.payload.includes(state.currentUserEmail)) throw new Error('You entered your own email')
       return {
         ...state,
-        emails:action.payload
+        emails: action.payload
       }
-      case 'REMOVE_EMAIL':
-        return{
-          ...state,
-          emails: state.emails.filter(email => email !== action.payload)
-        }
-      case 'SET_CURRENT_USER_EMAIL':
-        return{
-          ...state,
-          currentUserEmail: action.payload
-        }
+    case 'REMOVE_EMAIL':
+      return {
+        ...state,
+        emails: state.emails.filter(email => email !== action.payload)
+      }
   }
 }
 export default function useActionDropDown(initialState: ActionDropDownStateType) {
