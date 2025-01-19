@@ -52,3 +52,22 @@ declare interface ActionType {
   icon: string;
   value: string;
 }
+export interface ActionDropDownStateType {
+  isModalOpen: boolean;
+  isDropDownOpen: boolean;
+  action: ActionType | null;
+  name: string;
+  isLoading: boolean;
+}
+export type ActionDropDownActions =
+  | { type: 'SET_IS_MODAL_OPEN'; payload: boolean }
+  | { type: 'SET_IS_DROP_DOWN_OPEN'; payload: boolean }
+  | { type: 'SET_ACTION'; payload: ActionType | null }
+  | { type: 'SET_NAME'; payload: string }
+  | { type: 'SET_IS_LOADING'; payload: boolean }
+  | { type: 'SET_TO_INITIAL_STATE';payload: ActionDropDownStateType}
+
+export type ActionDropDownReducer = {
+  state: ActionDropDownStateType;
+  action: ActionDropDownActions;
+};
