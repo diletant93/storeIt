@@ -6,7 +6,8 @@ import { getFileTypesParams, parseQueryString } from "@/lib/utils";
 
 export default async function FileList({ type, searchParams }: FilesProps) {
     const searchQueryString = ((await searchParams)?.query) as string
-    const {searchText, sort, limit} =parseQueryString(searchQueryString)
+    const sort = ((await searchParams)?.sort) as string
+    const {searchText, limit} =parseQueryString(searchQueryString)
     const types = getFileTypesParams(type)
     const files = await getFiles({types,searchText,sort,limit})
     if(!files) return null
