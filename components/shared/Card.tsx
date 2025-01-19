@@ -3,6 +3,7 @@ import Link from "next/link";
 import Thumbnail from "../elements/Thumbnail";
 import { convertFileSize } from "@/lib/utils";
 import FormattedDateTime from "../elements/FormattedDateTime";
+import ActionDropDown from "../elements/ActionDropDown";
 
 export default function Card({file}:{file:IFileType}) {
   return (
@@ -10,7 +11,7 @@ export default function Card({file}:{file:IFileType}) {
         <div className="flex justify-between">
             <Thumbnail type={file.type} extension={file.extension} url={file.url} className="!size-20" imageClassName="!size-11"/>
             <div className="flex flex-col items-end justify-between">
-                <p>Actionsdropdown</p>
+                <ActionDropDown file={file}/>
                 <p className="body-1">{convertFileSize(file.size)}</p>
             </div>
         </div>

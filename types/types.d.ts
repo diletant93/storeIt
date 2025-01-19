@@ -47,3 +47,8 @@ export type IFileType = Models.Document & {
   size: number;
   users: string[];
 };
+declare interface ActionType {
+  label: string;
+  icon: string;
+  value: string;
+}
