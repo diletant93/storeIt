@@ -1,6 +1,6 @@
 'use server';
 
-import { IUserType, UploadFileType } from '@/types/types';
+import { IUserType, renameFileType, UploadFileType } from '@/types/types';
 import { createAdminClient } from '../appwrite';
 import { InputFile } from 'node-appwrite/file';
 import { appwriteConfig } from '../appwrite/config';
@@ -9,6 +9,7 @@ import { constructFileUrl, getFileType, parseStringify } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from './user.actions';
 import { redirect } from 'next/navigation';
+import { create } from 'domain';
 export async function uploadFile({
   file,
   ownerId,
@@ -88,4 +89,23 @@ function createQueries(currentUser:IUserType){
     ]
     //TODO: search , sort ,limits...
     return queries
+}
+export async function renameFile({fileId,name,extension,path}: renameFileType){
+  try {
+    const {databases} = await createAdminClient()
+    const newName = `${name}.${extension}`
+    const updatedFile = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.filesColectionId,
+      fileId,
+      {
+        name:newName
+      }
+    )
+    revalidatePath(path)
+    return updatedFile
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
 }

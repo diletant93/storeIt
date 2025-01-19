@@ -71,3 +71,10 @@ export type ActionDropDownReducer = {
   state: ActionDropDownStateType;
   action: ActionDropDownActions;
 };
+
+export interface renameFileType{
+  fileId:string;
+  name:string;
+  extension:string;
+  path:string;
+}

@@ -19,15 +19,18 @@ import {
     DropdownMenuTrigger,
 } from "@/components_shadcn/ui/dropdown-menu"
 import { Input } from "@/components_shadcn/ui/input";
-import { actionsDropdownItems } from "@/constants";
+import { actionsDropdownItems, EXTENSIONS } from "@/constants";
 import useActionDropDown, { INITIAL_STATE } from "@/hooks/useActionDropDown";
+import { renameFile } from "@/lib/actions/file.actions";
 import { constructDownloadUrl } from "@/lib/utils";
 import { ActionType, IFileType } from "@/types/types";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function ActionDropDown({ file }: { file: IFileType }) {
-    const { state, dispatch } = useActionDropDown({ ...INITIAL_STATE, name: file.name })
+    const { state, dispatch } = useActionDropDown({ ...INITIAL_STATE, name: file.name.replace(EXTENSIONS, '') })
+    const pathname = usePathname()
     function handleAction(action: ActionType) {
         dispatch({ type: 'SET_ACTION', payload: action })
         const actions = ['rename', 'share', 'delete', 'details']
@@ -35,11 +38,20 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
             dispatch({ type: 'SET_IS_MODAL_OPEN', payload: true })
         }
     }
-    function handleCloseAllModals(){
-        dispatch({type:'SET_TO_INITIAL_STATE', payload: {...INITIAL_STATE,name:file.name}})
+    function handleCloseAllModals() {
+        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name} })
     }
-    async function handleActions(){
-
+    async function handleActions() {
+        if (!state.action) return
+        dispatch({ type: 'SET_IS_LOADING', payload: true })
+        let success: unknown;
+        const actions = {
+            rename: () => renameFile({ fileId: file.$id, name: state.name, extension: file.extension, path: pathname }),
+            share: () => console.log('share'),
+            delete: () => console.log('delete'),
+        }
+        success = await actions[state.action.value as keyof typeof actions]()
+        if (success) handleCloseAllModals()
     }
     function renderDialogContent() {
         if (!state.action) return null
@@ -55,11 +67,11 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
                 </DialogHeader>
                 {renameDeleteShare.includes(value) && (
                     <DialogFooter className="flex flex-col gap-3 md:flex-row">
-                        <Button type="button" onClick={handleCloseAllModals}>Cancel</Button>
-                        <Button type="button">
+                        <Button type="button" onClick={handleCloseAllModals} className="modal-cancel-button">Cancel</Button>
+                        <Button type="button" onClick={handleActions} className="modal-submit-button">
                             <p className="capitalize">{value}</p>
                             {state.isLoading && (
-                                <Image src="/assests/icons/loader.svg" alt="laoder" width={24} height={24} className="animate-spin" />
+                                <Image src="/assets/icons/loader.svg" alt="laoder" width={24} height={24} className="animate-spin" />
                             )}
                         </Button>
                     </DialogFooter>
