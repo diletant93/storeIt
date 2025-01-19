@@ -91,6 +91,6 @@ export interface toastErrorType{
   message?:string;
 }
 export interface deleteFileType{
-  fileId: string;
+  file: IFileType;
   path:string;
 }

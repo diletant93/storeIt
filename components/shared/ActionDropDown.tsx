@@ -28,6 +28,7 @@ import { usePathname } from "next/navigation";
 import FileDetails from "../elements/FileDetails";
 import ShareInput from "../elements/ShareInput";
 import useErrorToast from "@/hooks/useErrorToast";
+import useSuccessToast from "@/hooks/useSuccessToast";
 
 export default function ActionDropDown({ file }: { file: IFileType }) {
     function getInitialState() {
@@ -39,6 +40,7 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
     }
     const { state, dispatch } = useActionDropDown(getInitialState())
     const { toastError } = useErrorToast()
+    const { toastSuccess} = useSuccessToast()
     const pathname = usePathname()
 
     function handleAction(action: ActionType) {
@@ -52,7 +54,10 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
     function handleCloseAllModals() {
         dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name } })
     }
-
+    function handleSuccessAction(){
+        handleCloseAllModals()
+        toastSuccess({message:'Done'})
+    }
     async function handleRemoveUser(email: string) {
         dispatch({ type: 'SET_IS_LOADING', payload: true })
         dispatch({ type: 'REMOVE_EMAIL', payload: email })
@@ -79,7 +84,7 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
         const actions = {
             rename: () => renameFile({ fileId: file.$id, name: state.name, extension: file.extension, path: pathname }),
             share: () => updateFileUsers({ fileId: file.$id, emails: state.emails, path: pathname }),
-            delete: () => deleteFile({ fileId: file.$id, path: pathname }),
+            delete: () => deleteFile({ file: file, path: pathname }),
         }
         try {
             success = await actions[state.action.value as keyof typeof actions]()
@@ -91,7 +96,7 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
             }
             return toastError({ message: 'Something went wrong' })
         }
-        if (success) handleCloseAllModals()
+        if (success) handleSuccessAction()
     }
 
     function renderDialogContent() {

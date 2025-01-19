@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  deleteFileType,
   IFileType,
   IUserType,
   renameFileType,
@@ -195,15 +196,22 @@ async function isEnteredOwnEmail(emails:string[]){
 }
 
 
-export async function deleteFile({fileId, path}:{fileId:string; path:string}){
+export async function deleteFile({file, path}:deleteFileType){
   try {
-    const {databases} = await createAdminClient()
-    await databases.deleteDocument(
+    const {databases , storage} = await createAdminClient()
+    const deletedFile = await databases.deleteDocument(
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
-      fileId
+      file.$id
     )
+    if(!deletedFile) throw new Error('could not delete the file')
+    await storage.deleteFile(
+      appwriteConfig.storageId,
+      file.storageFileId
+    )
+
     revalidatePath(path)
+    
   } catch (error) {
     console.log(error)
     throw error

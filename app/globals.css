@@ -278,11 +278,11 @@
     @apply body-2 mx-auto w-fit rounded-xl bg-error/5 px-8 py-4 text-center text-error !important;
   }
   /*Modal*/
-  .overlay{
-    @apply fixed inset-0 w-full h-dvh flex justify-center items-center backdrop-blur-md
+  .overlay {
+    @apply fixed inset-0 flex h-dvh w-full items-center justify-center backdrop-blur-md;
   }
-  .window{
-    @apply max-w-[700px] max-h-[700px] rounded-md p-5 bg-slate-400 border border-black relative
+  .window {
+    @apply relative max-h-[700px] max-w-[700px] rounded-md border border-black bg-slate-400 p-5;
   }
   /* Card */
   .file-card {
@@ -326,11 +326,14 @@
     @apply flex items-center justify-between gap-3 rounded-xl p-3 shadow-drop-3 !important;
   }
   .preview-item-name {
-    @apply flex flex-col gap-2 subtitle-2 mb-2 line-clamp-1 max-w-[240px] !important;
+    @apply subtitle-2 mb-2 line-clamp-1 flex max-w-[240px] flex-col gap-2 !important;
   }
 
   .error-toast {
     @apply !rounded-[10px] bg-red !important;
+  }
+  .success-toast {
+    @apply !rounded-[10px] bg-green !important;
   }
 
   /* Header */
