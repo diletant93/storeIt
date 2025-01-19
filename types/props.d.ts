@@ -60,3 +60,7 @@ export interface HeaderProps{
   accountId: string;
   ownerId:string;
 }
+export interface FormattedDateTimeProps{
+  date:string;
+  className?:string;
+}

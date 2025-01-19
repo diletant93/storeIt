@@ -1,3 +1,4 @@
+import Card from "@/components/shared/Card";
 import Sort from "@/components/shared/Sort";
 import { getFiles } from "@/lib/actions/file.actions";
 import { IFileType } from "@/types/types";
@@ -34,8 +35,8 @@ export default async function Page({params}: PageParams) {
        {/* render the files  */}
        {files.length > 0 ? (
         <section className="file-list">
-            {files.map((file: Models.Document)=>(
-                <h1 key={file.$id} className="h1">{file.name}</h1>
+            {(files as IFileType[]).map((file:IFileType)=>(
+                    <Card file={file} key={file.$id}/>
             ))}
         </section>
        ):(

@@ -42,7 +42,7 @@ export type IFileType = Models.Document & {
   type: string;
   storageFileId: string;
   accountId: string;
-  owner: string;
+  owner: IUserType;
   extension: string;
   size: number;
   users: string[];
