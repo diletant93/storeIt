@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  IFileType,
   IUserType,
   renameFileType,
   updateFileUsersType,
@@ -69,7 +70,7 @@ export async function getFiles() {
     const { databases } = await createAdminClient();
     const currentUser = await getCurrentUser();
     if (!currentUser) return redirect('/sign-in');
-
+    console.log('fetching files')
     const queries = createQueries(currentUser);
     const result = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -77,9 +78,9 @@ export async function getFiles() {
       queries,
     );
 
-    if (result.total <= 0) throw new Error('there are no files yet');
+    if (result.total <= 0) return null
 
-    return result.documents;
+    return (result.documents) as IFileType[];
   } catch (error) {
     console.log(error);
     throw error;
@@ -125,12 +126,21 @@ export async function updateFileUsers({
   emails,
   path,
 }: updateFileUsersType) {
+  console.log('inside update')
   try {
     const { databases } = await createAdminClient();
-    
+    console.log('emails:',emails)
     const allValuesExist = await isAvailableEmails(emails)
+    console.log('allValuesExist:',allValuesExist)
     if(!allValuesExist) throw new Error('You entered an unexisting email')
   
+      const isOwnEmail = await isEnteredOwnEmail(emails)
+      console.log('isOwnEmail',isOwnEmail)
+    if(isOwnEmail){
+      console.log('inside throwing an error own email')
+       throw new Error('You entered your own email')
+      }
+    
     const updatedFile = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
@@ -181,5 +191,21 @@ async function isEnteredOwnEmail(emails:string[]){
   } catch (error) {
     console.log(error);
     throw error;
+  }
+}
+
+
+export async function deleteFile({fileId, path}:{fileId:string; path:string}){
+  try {
+    const {databases} = await createAdminClient()
+    await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.filesColectionId,
+      fileId
+    )
+    revalidatePath(path)
+  } catch (error) {
+    console.log(error)
+    throw error
   }
 }

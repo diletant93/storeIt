@@ -6,7 +6,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components_shadcn/ui/dialog"
 
 import {
@@ -20,7 +19,7 @@ import {
 import { Input } from "@/components_shadcn/ui/input";
 import { actionsDropdownItems, EXTENSIONS } from "@/constants";
 import useActionDropDown, { INITIAL_STATE } from "@/hooks/useActionDropDown";
-import { renameFile, updateFileUsers } from "@/lib/actions/file.actions";
+import { deleteFile, renameFile, updateFileUsers } from "@/lib/actions/file.actions";
 import { constructDownloadUrl } from "@/lib/utils";
 import { ActionType, IFileType } from "@/types/types";
 import Image from "next/image";
@@ -28,9 +27,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import FileDetails from "../elements/FileDetails";
 import ShareInput from "../elements/ShareInput";
-import { useToast } from "@/hooks/use-toast";
 import useErrorToast from "@/hooks/useErrorToast";
-import { getCurrentUser } from "@/lib/actions/user.actions";
 
 export default function ActionDropDown({ file }: { file: IFileType }) {
     function getInitialState() {
@@ -53,16 +50,26 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
     }
 
     function handleCloseAllModals() {
-        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name} })
+        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name } })
     }
 
     async function handleRemoveUser(email: string) {
         dispatch({ type: 'SET_IS_LOADING', payload: true })
         dispatch({ type: 'REMOVE_EMAIL', payload: email })
-        await updateFileUsers({ fileId: file.$id, emails: state.emails, path: pathname })
+        try {
+            await updateFileUsers({ fileId: file.$id, emails: state.emails, path: pathname })
+        } catch (error) {
+            dispatch({ type: 'SET_IS_LOADING', payload: false })
+            if (error instanceof Error) {
+                console.log('inside the toasts')
+                return toastError({ message: error.message })
+            }
+            return toastError({ message: 'Something went wrong' })
+        }
+
         dispatch({ type: 'SET_IS_LOADING', payload: false })
     }
-    async function handleInputEmail(emails: string[]) {
+    function handleInputEmail(emails: string[]) {
         dispatch({ type: 'SET_EMAILS', payload: emails })
     }
     async function handleActions() {
@@ -72,7 +79,7 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
         const actions = {
             rename: () => renameFile({ fileId: file.$id, name: state.name, extension: file.extension, path: pathname }),
             share: () => updateFileUsers({ fileId: file.$id, emails: state.emails, path: pathname }),
-            delete: () => console.log('delete'),
+            delete: () => deleteFile({ fileId: file.$id, path: pathname }),
         }
         try {
             success = await actions[state.action.value as keyof typeof actions]()
@@ -101,8 +108,14 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
                     {value === 'details' && <FileDetails file={file} />}
                     {value === 'share' && <ShareInput
                         file={file}
-                        onInputChange={(emails: string[]) => { handleInputEmail(emails) }}
+                        onInputChange={handleInputEmail}
                         onRemove={handleRemoveUser} />}
+                    {value === 'delete' && (
+                        <p className="delete-confirmation">
+                            Are you sure you want to delete{' '}
+                            <span className="delete-file-name">{file.name}</span>
+                        </p>
+                    )}
                 </DialogHeader>
                 {renameDeleteShare.includes(value) && (
                     <DialogFooter className="flex flex-col gap-3 md:flex-row">

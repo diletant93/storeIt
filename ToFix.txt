@@ -1,0 +1,2 @@
+1) in the page we are fetching files every render for each page. 
+We need to fetch just once and all the other pages should use that

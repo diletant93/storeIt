@@ -90,3 +90,7 @@ export interface toastErrorType{
   messageJSX?:React.ReactNode;
   message?:string;
 }
+export interface deleteFileType{
+  fileId: string;
+  path:string;
+}
