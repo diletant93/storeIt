@@ -21,7 +21,6 @@ export default function FileUploader({ownerId,accountId,className}:FileUploaderP
     const uploadPromises = acceptedFiles.map(async(file)=>{
       if(file.size > MAX_FILE_SIZE){
         setFiles(cur => cur.filter(curFile => curFile.name !== file.name)) 
-        console.log('inside oversize')
         return toast({description:(<p className='body-2 text-white'>
           <span className='font-semibold'>
             {file.name}{' '}
@@ -38,7 +37,6 @@ export default function FileUploader({ownerId,accountId,className}:FileUploaderP
       })
     })
     await Promise.all(uploadPromises)
-    // Do something with the files
   }, [ownerId,accountId,pathname])
   const {getRootProps, getInputProps} = useDropzone({onDrop})
   function handleRemoveFile(e:React.MouseEvent<HTMLImageElement>, fileName: string){

@@ -17,11 +17,13 @@ export async function uploadFile({
   try {
     const { storage, databases } = await createAdminClient();
     const inputFile = InputFile.fromBuffer(file, file.name);
+    
     const storageFile = await storage.createFile(
         appwriteConfig.storageId,
         ID.unique(),
         inputFile
     );
+
     const fileDocument = {
         type: getFileType(storageFile.name).type,
         name: storageFile.name,
@@ -32,6 +34,7 @@ export async function uploadFile({
         owner:ownerId,
         accountId:accountId,
     }
+
     const newFile = await databases.createDocument(
         appwriteConfig.databaseId,
         appwriteConfig.filesColectionId,
