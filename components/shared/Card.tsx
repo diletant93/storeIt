@@ -3,7 +3,7 @@ import Link from "next/link";
 import Thumbnail from "../elements/Thumbnail";
 import { convertFileSize } from "@/lib/utils";
 import FormattedDateTime from "../elements/FormattedDateTime";
-import ActionDropDown from "../elements/ActionDropDown";
+import ActionDropDown from "./ActionDropDown";
 
 export default function Card({file}:{file:IFileType}) {
   return (

@@ -3,7 +3,6 @@ import { Button } from "@/components_shadcn/ui/button";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -27,10 +26,17 @@ import { ActionType, IFileType } from "@/types/types";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import FileDetails from "../elements/FileDetails";
+import ShareInput from "../elements/ShareInput";
 
 export default function ActionDropDown({ file }: { file: IFileType }) {
-    const { state, dispatch } = useActionDropDown({ ...INITIAL_STATE, name: file.name.replace(EXTENSIONS, '') })
+    const initialState = {
+        ...INITIAL_STATE,
+        name:file.name.replace(EXTENSIONS, '')
+    }
+    const { state, dispatch } = useActionDropDown(initialState)
     const pathname = usePathname()
+
     function handleAction(action: ActionType) {
         dispatch({ type: 'SET_ACTION', payload: action })
         const actions = ['rename', 'share', 'delete', 'details']
@@ -38,9 +44,15 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
             dispatch({ type: 'SET_IS_MODAL_OPEN', payload: true })
         }
     }
+
     function handleCloseAllModals() {
-        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name} })
+        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name } })
     }
+    
+    function handleRemoveUser(email:string){
+
+    }
+
     async function handleActions() {
         if (!state.action) return
         dispatch({ type: 'SET_IS_LOADING', payload: true })
@@ -53,10 +65,11 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
         success = await actions[state.action.value as keyof typeof actions]()
         if (success) handleCloseAllModals()
     }
+
     function renderDialogContent() {
         if (!state.action) return null
         const { value, label } = state.action
-        const renameDeleteShare = ['rename', 'delete', 'share']
+        const renameDeleteShare = ['rename', 'delete', 'share'] 
         return (
             <DialogContent className="shad-dialog button">
                 <DialogHeader className="flex flex-col gap-3">
@@ -64,6 +77,8 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
                     {value === 'rename' && (
                         <Input type="text" value={state.name} onChange={(e) => { dispatch({ type: 'SET_NAME', payload: e.target.value }) }} />
                     )}
+                    {value === 'details' &&<FileDetails file={file}/>}
+                    {value === 'share' && <ShareInput file={file} onInputChange={(emails:string[])=>{dispatch({type:'SET_EMAILS',payload:emails})}} onRemove={handleRemoveUser}/>}
                 </DialogHeader>
                 {renameDeleteShare.includes(value) && (
                     <DialogFooter className="flex flex-col gap-3 md:flex-row">
@@ -79,6 +94,7 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
             </DialogContent>
         )
     }
+
     return (
         <Dialog open={state.isModalOpen} onOpenChange={(open: boolean) => { dispatch({ type: 'SET_IS_MODAL_OPEN', payload: open }) }}>
             <DropdownMenu open={state.isDropDownOpen} onOpenChange={(open: boolean) => { dispatch({ type: 'SET_IS_DROP_DOWN_OPEN', payload: open }) }}>

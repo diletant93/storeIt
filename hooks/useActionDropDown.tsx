@@ -5,7 +5,8 @@ export const INITIAL_STATE = {
   isDropDownOpen: false,
   action: null,
   name: '',
-  isLoading: false
+  isLoading: false,
+  emails:[]
 }
 function reducer(state: ActionDropDownStateType, action: ActionDropDownActions): ActionDropDownStateType {
   switch (action.type) {
@@ -36,6 +37,11 @@ function reducer(state: ActionDropDownStateType, action: ActionDropDownActions):
       }
     case 'SET_TO_INITIAL_STATE':
       return action.payload
+    case "SET_EMAILS":
+      return {
+        ...state,
+        emails:action.payload
+      }
   }
 }
 export default function useActionDropDown(initialState: ActionDropDownStateType) {

@@ -58,6 +58,7 @@ export interface ActionDropDownStateType {
   action: ActionType | null;
   name: string;
   isLoading: boolean;
+  emails: string[];
 }
 export type ActionDropDownActions =
   | { type: 'SET_IS_MODAL_OPEN'; payload: boolean }
@@ -65,16 +66,17 @@ export type ActionDropDownActions =
   | { type: 'SET_ACTION'; payload: ActionType | null }
   | { type: 'SET_NAME'; payload: string }
   | { type: 'SET_IS_LOADING'; payload: boolean }
-  | { type: 'SET_TO_INITIAL_STATE';payload: ActionDropDownStateType}
+  | { type: 'SET_TO_INITIAL_STATE'; payload: ActionDropDownStateType }
+  | { type: 'SET_EMAILS'; payload: string[] };
 
 export type ActionDropDownReducer = {
   state: ActionDropDownStateType;
   action: ActionDropDownActions;
 };
 
-export interface renameFileType{
-  fileId:string;
-  name:string;
-  extension:string;
-  path:string;
+export interface renameFileType {
+  fileId: string;
+  name: string;
+  extension: string;
+  path: string;
 }

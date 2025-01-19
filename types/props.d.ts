@@ -64,3 +64,12 @@ export interface FormattedDateTimeProps{
   date:string;
   className?:string;
 }
+export type DetailRowProps={
+  value:string;
+  label:string;
+}
+export type ShareInputProps={
+  file:IFileType;
+  onInputChange:(emails:string[])=>void;
+  onRemove:(email:string)=>void;
+}
