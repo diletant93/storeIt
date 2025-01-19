@@ -94,3 +94,16 @@ export interface deleteFileType{
   file: IFileType;
   path:string;
 }
+export interface getFilesType{
+  types:string[];
+  searchText?:string;
+  sort?:string;
+  limit?:number;
+}
+export interface createQueriesType{
+  currentUser: IUserType,
+  types?:string[];
+  searchText?:string;
+  sort?:string;
+  limit?:number;
+}

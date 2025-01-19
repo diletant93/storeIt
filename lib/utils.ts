@@ -244,3 +244,33 @@ export const getFileTypesParams = (type: string) => {
       return ['document'];
   }
 };
+export function parseQueryString(queryString: string) {
+  const result: { searchText?: string; sort?: string; limit?: number } = {};
+
+  // Ensure the query string is not empty
+  if (!queryString || queryString.trim() === '') {
+    return result;
+  }
+
+  // Split the query string into parts using '?' as the delimiter
+  const parts = queryString.split('?');
+
+  // The first part before '?' is the filter (if it exists and is not empty)
+  if (parts[0] && parts[0].trim() !== '') {
+    result.searchText = parts[0];
+  }
+
+  // Process the remaining parts (e.g., sort and limit)
+  parts.slice(1).forEach((part) => {
+    if (part.startsWith('sort=')) {
+      result.sort = part.replace('sort=', '');
+    } else if (part.startsWith('limit=')) {
+      const limitValue = parseInt(part.replace('limit=', ''), 10);
+      if (!isNaN(limitValue)) {
+        result.limit = limitValue;
+      }
+    }
+  });
+
+  return result;
+}

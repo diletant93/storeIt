@@ -1,7 +1,9 @@
 'use server';
 
 import {
+  createQueriesType,
   deleteFileType,
+  getFilesType,
   IFileType,
   IUserType,
   renameFileType,
@@ -66,35 +68,60 @@ export async function uploadFile({
   }
 }
 
-export async function getFiles() {
+export async function getFiles({
+  types,
+  searchText = '',
+  sort = '$createdAt-desc',
+  limit = 10,
+}: getFilesType) {
   try {
     const { databases } = await createAdminClient();
     const currentUser = await getCurrentUser();
     if (!currentUser) return redirect('/sign-in');
-    console.log('fetching files')
-    const queries = createQueries(currentUser);
+    const queries = createQueries({
+      currentUser,
+      types,
+      searchText,
+      sort,
+      limit,
+    });
     const result = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
       queries,
     );
 
-    if (result.total <= 0) return null
+    if (result.total <= 0) return null;
 
-    return (result.documents) as IFileType[];
+    return result.documents as IFileType[];
   } catch (error) {
     console.log(error);
     throw error;
   }
 }
-function createQueries(currentUser: IUserType) {
+function createQueries({
+  currentUser,
+  types,
+  sort='$createdAt-desc',
+  limit,
+  searchText,
+}: createQueriesType) {
   const queries = [
     Query.or([
       Query.equal('owner', currentUser.$id),
       Query.contains('users', currentUser.email),
     ]),
   ];
-  //TODO: search , sort ,limits...
+  if (types) queries.push(Query.equal('type', types));
+  if (searchText) queries.push(Query.contains('name', searchText));
+  if (limit) queries.push(Query.limit(limit));
+  if (sort) {
+    console.log(sort)
+    const [sortBy, orderBy] = sort.split('-');
+    queries.push(
+      orderBy === 'asc' ? Query.orderAsc(sortBy) : Query.orderDesc(sortBy),
+    );
+  }
   return queries;
 }
 export async function renameFile({
@@ -127,21 +154,21 @@ export async function updateFileUsers({
   emails,
   path,
 }: updateFileUsersType) {
-  console.log('inside update')
+  console.log('inside update');
   try {
     const { databases } = await createAdminClient();
-    console.log('emails:',emails)
-    const allValuesExist = await isAvailableEmails(emails)
-    console.log('allValuesExist:',allValuesExist)
-    if(!allValuesExist) throw new Error('You entered an unexisting email')
-  
-      const isOwnEmail = await isEnteredOwnEmail(emails)
-      console.log('isOwnEmail',isOwnEmail)
-    if(isOwnEmail){
-      console.log('inside throwing an error own email')
-       throw new Error('You entered your own email')
-      }
-    
+    console.log('emails:', emails);
+    const allValuesExist = await isAvailableEmails(emails);
+    console.log('allValuesExist:', allValuesExist);
+    if (!allValuesExist) throw new Error('You entered an unexisting email');
+
+    const isOwnEmail = await isEnteredOwnEmail(emails);
+    console.log('isOwnEmail', isOwnEmail);
+    if (isOwnEmail) {
+      console.log('inside throwing an error own email');
+      throw new Error('You entered your own email');
+    }
+
     const updatedFile = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
@@ -175,7 +202,7 @@ async function isAvailableEmails(emails: string[]) {
       availableEmailSet.has(email),
     );
 
-    console.log(allValuesExist)
+    console.log(allValuesExist);
 
     return allValuesExist;
   } catch (error) {
@@ -183,37 +210,32 @@ async function isAvailableEmails(emails: string[]) {
     throw error;
   }
 }
-async function isEnteredOwnEmail(emails:string[]){
+async function isEnteredOwnEmail(emails: string[]) {
   try {
-    const currentUser = await getCurrentUser()
-    const emailsSet = new Set(emails)
-    console.log('emailSet:',emailsSet)
-    return emailsSet.has(currentUser!.email)
+    const currentUser = await getCurrentUser();
+    const emailsSet = new Set(emails);
+    console.log('emailSet:', emailsSet);
+    return emailsSet.has(currentUser!.email);
   } catch (error) {
     console.log(error);
     throw error;
   }
 }
 
-
-export async function deleteFile({file, path}:deleteFileType){
+export async function deleteFile({ file, path }: deleteFileType) {
   try {
-    const {databases , storage} = await createAdminClient()
+    const { databases, storage } = await createAdminClient();
     const deletedFile = await databases.deleteDocument(
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
-      file.$id
-    )
-    if(!deletedFile) throw new Error('could not delete the file')
-    await storage.deleteFile(
-      appwriteConfig.storageId,
-      file.storageFileId
-    )
+      file.$id,
+    );
+    if (!deletedFile) throw new Error('could not delete the file');
+    await storage.deleteFile(appwriteConfig.storageId, file.storageFileId);
 
-    revalidatePath(path)
-    
+    revalidatePath(path);
   } catch (error) {
-    console.log(error)
-    throw error
+    console.log(error);
+    throw error;
   }
 }

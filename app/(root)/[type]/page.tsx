@@ -1,20 +1,13 @@
+import Loader from "@/components/elements/Loader";
 import Card from "@/components/shared/Card";
+import FileList from "@/components/shared/FileList";
 import Sort from "@/components/shared/Sort";
 import { getFiles } from "@/lib/actions/file.actions";
-import { IFileType } from "@/types/types";
-import { redirect } from "next/navigation";
-import { cache } from "react";
-
-interface PageParams {
-    params: {
-        type: string;
-    };
-}
-
-export default async function Page({ params }: PageParams) {
-    const type = (await params)?.type as string
-    const files = await getFiles()
-    if(!files) return <p>There are no files yet</p>
+import { getFileTypesParams, parseQueryString } from "@/lib/utils";
+import { SearchParamProps } from "@/types/props";
+import { Suspense } from "react";
+export default async function Page({ params, searchParams }: SearchParamProps) {
+    let type = (await params)?.type as string
     return (
         <div className="page-container">
             <section className="w-full">
@@ -35,17 +28,9 @@ export default async function Page({ params }: PageParams) {
                     </div>
                 </div>
             </section>
-            {files.length > 0 ? (
-                <section className="file-list">
-                    {(files as IFileType[]).map((file: IFileType) => (
-                        <Card file={file} key={file.$id} />
-                    ))}
-                </section>
-            ) : (
-                <section>
-
-                </section>
-            )}
+            <Suspense fallback={<Loader/>}>
+                <FileList type={type} searchParams={searchParams}/>
+            </Suspense> 
         </div>
     );
 }

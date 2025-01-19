@@ -74,3 +74,12 @@ export type ShareInputProps={
   onInputChange:(emails:string[])=>void;
   onRemove:(email:string)=>void;
 }
+export type FilesProps={
+  searchParams?:Promise<{[key:string]:string| string[]|undefined}>
+  type:string;
+}
+
+export interface SearchParamProps {
+  params?: Promise<SegmentParams>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
