@@ -11,23 +11,23 @@ import { useToast } from '@/hooks/use-toast'
 import { uploadFile } from '@/lib/actions/file.actions'
 import { usePathname } from 'next/navigation'
 import { Models } from 'node-appwrite'
+import useErrorToast from '@/hooks/useErrorToast'
 
 export default function FileUploader({ownerId,accountId,className}:FileUploaderProps) {
   const [files,setFiles] = useState<File[]>([])
-  const {toast} = useToast()
+  const {toastError} = useErrorToast()
   const pathname = usePathname()
   const onDrop = useCallback(async (acceptedFiles:File[]) => {
     setFiles(acceptedFiles)
     const uploadPromises = acceptedFiles.map(async(file)=>{
       if(file.size > MAX_FILE_SIZE){
         setFiles(cur => cur.filter(curFile => curFile.name !== file.name)) 
-        return toast({description:(<p className='body-2 text-white'>
+        return toastError({messageJSX:(<p className='body-2 text-white'>
           <span className='font-semibold'>
             {file.name}{' '}
           </span>
            is too large. Max file size is 50
-        </p>),
-        className:'error-toast'})
+        </p>)})
       }
       return uploadFile({file, ownerId, accountId, path:pathname })
       .then((uploadedFile:Models.Document)=>{

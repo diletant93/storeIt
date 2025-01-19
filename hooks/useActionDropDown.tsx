@@ -1,3 +1,4 @@
+import { getCurrentUser } from "@/lib/actions/user.actions";
 import { ActionDropDownActions, ActionDropDownStateType } from "@/types/types";
 import { useReducer } from "react";
 export const INITIAL_STATE = {
@@ -38,10 +39,21 @@ function reducer(state: ActionDropDownStateType, action: ActionDropDownActions):
     case 'SET_TO_INITIAL_STATE':
       return action.payload
     case "SET_EMAILS":
+      if(action.payload.includes(state.currentUserEmail)) throw new Error('You entered your own email')
       return {
         ...state,
         emails:action.payload
       }
+      case 'REMOVE_EMAIL':
+        return{
+          ...state,
+          emails: state.emails.filter(email => email !== action.payload)
+        }
+      case 'SET_CURRENT_USER_EMAIL':
+        return{
+          ...state,
+          currentUserEmail: action.payload
+        }
   }
 }
 export default function useActionDropDown(initialState: ActionDropDownStateType) {

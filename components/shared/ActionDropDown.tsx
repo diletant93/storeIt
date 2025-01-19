@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components_shadcn/ui/input";
 import { actionsDropdownItems, EXTENSIONS } from "@/constants";
 import useActionDropDown, { INITIAL_STATE } from "@/hooks/useActionDropDown";
-import { renameFile } from "@/lib/actions/file.actions";
+import { renameFile, updateFileUsers } from "@/lib/actions/file.actions";
 import { constructDownloadUrl } from "@/lib/utils";
 import { ActionType, IFileType } from "@/types/types";
 import Image from "next/image";
@@ -28,13 +28,23 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import FileDetails from "../elements/FileDetails";
 import ShareInput from "../elements/ShareInput";
+import { useToast } from "@/hooks/use-toast";
+import useErrorToast from "@/hooks/useErrorToast";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 
-export default function ActionDropDown({ file }: { file: IFileType }) {
-    const initialState = {
-        ...INITIAL_STATE,
-        name:file.name.replace(EXTENSIONS, '')
+export default async function ActionDropDown({ file }: { file: IFileType }) {
+    async function getInitialState(){
+        const currentUser = await getCurrentUser()
+        const currentUserEmail = currentUser!.email
+        const initialState = {
+            ...INITIAL_STATE,
+            name: file.name.replace(EXTENSIONS, ''),
+            currentUserEmail
+        }
+        return initialState
     }
-    const { state, dispatch } = useActionDropDown(initialState)
+    const { state, dispatch } = useActionDropDown(await getInitialState())
+    const { toastError } = useErrorToast()
     const pathname = usePathname()
 
     function handleAction(action: ActionType) {
@@ -46,30 +56,52 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
     }
 
     function handleCloseAllModals() {
-        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name } })
-    }
-    
-    function handleRemoveUser(email:string){
-
+        dispatch({ type: 'SET_TO_INITIAL_STATE', payload: { ...INITIAL_STATE, name: state.name, currentUserEmail: state.currentUserEmail } })
     }
 
+    async function handleRemoveUser(email: string) {
+        dispatch({type:'SET_IS_LOADING', payload:true})
+        dispatch({ type: 'REMOVE_EMAIL', payload: email })
+        await updateFileUsers({ fileId: file.$id, emails: state.emails, path: pathname })
+        dispatch({type:'SET_IS_LOADING', payload:false})
+    }
+    async function handleInputEmail(emails:string[]){
+        try {
+            dispatch({ type: 'SET_EMAILS', payload: emails })
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('inside the toasts')
+                return toastError({ message: error.message })
+            }
+            return toastError({ message: 'Something went wrong' })
+        }
+    }
     async function handleActions() {
         if (!state.action) return
         dispatch({ type: 'SET_IS_LOADING', payload: true })
         let success: unknown;
         const actions = {
             rename: () => renameFile({ fileId: file.$id, name: state.name, extension: file.extension, path: pathname }),
-            share: () => console.log('share'),
+            share: () => updateFileUsers({ fileId: file.$id, emails: state.emails, path: pathname }),
             delete: () => console.log('delete'),
         }
-        success = await actions[state.action.value as keyof typeof actions]()
+        try {
+            success = await actions[state.action.value as keyof typeof actions]()
+        } catch (error) {
+            dispatch({ type: 'SET_IS_LOADING', payload: false })
+            if (error instanceof Error) {
+                console.log('inside the toasts')
+                return toastError({ message: error.message })
+            }
+            return toastError({ message: 'Something went wrong' })
+        }
         if (success) handleCloseAllModals()
     }
 
     function renderDialogContent() {
         if (!state.action) return null
         const { value, label } = state.action
-        const renameDeleteShare = ['rename', 'delete', 'share'] 
+        const renameDeleteShare = ['rename', 'delete', 'share']
         return (
             <DialogContent className="shad-dialog button">
                 <DialogHeader className="flex flex-col gap-3">
@@ -77,8 +109,11 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
                     {value === 'rename' && (
                         <Input type="text" value={state.name} onChange={(e) => { dispatch({ type: 'SET_NAME', payload: e.target.value }) }} />
                     )}
-                    {value === 'details' &&<FileDetails file={file}/>}
-                    {value === 'share' && <ShareInput file={file} onInputChange={(emails:string[])=>{dispatch({type:'SET_EMAILS',payload:emails})}} onRemove={handleRemoveUser}/>}
+                    {value === 'details' && <FileDetails file={file} />}
+                    {value === 'share' && <ShareInput
+                        file={file}
+                        onInputChange={(emails: string[]) => { handleInputEmail(emails)  }}
+                        onRemove={handleRemoveUser} />}
                 </DialogHeader>
                 {renameDeleteShare.includes(value) && (
                     <DialogFooter className="flex flex-col gap-3 md:flex-row">

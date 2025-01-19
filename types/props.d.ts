@@ -1,4 +1,5 @@
 import React from 'react';
+import { IFileType } from './types';
 
 export type FormTypeProp = 'sign-in' | 'sign-up';
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { createAccountType, SecretCodeType } from '@/types/types';
+import { createAccountType, IUserType, SecretCodeType } from '@/types/types';
 import { createAdminClient, createSessionClient } from '../appwrite';
 import { appwriteConfig } from '../appwrite/config';
 import { Query, ID } from 'node-appwrite';
@@ -79,14 +79,17 @@ export async function verifySecretCode({
 export async function getCurrentUser() {
   try {
     const { databases, account } = await createSessionClient();
+    
     const result = await account.get();
+    if(!result) return redirect('/sign-in')
+
     const user = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersColectionId,
       [Query.equal('accountId', result.$id)],
     );
     if (user.total <= 0) return null;
-    return parseStringify(user.documents[0]);
+    return (parseStringify(user.documents[0])) as IUserType;
   } catch (error) {
     handleError(error, 'Could not get the current user');
   }

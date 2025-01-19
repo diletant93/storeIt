@@ -59,6 +59,7 @@ export interface ActionDropDownStateType {
   name: string;
   isLoading: boolean;
   emails: string[];
+  currentUserEmail:string;
 }
 export type ActionDropDownActions =
   | { type: 'SET_IS_MODAL_OPEN'; payload: boolean }
@@ -67,7 +68,9 @@ export type ActionDropDownActions =
   | { type: 'SET_NAME'; payload: string }
   | { type: 'SET_IS_LOADING'; payload: boolean }
   | { type: 'SET_TO_INITIAL_STATE'; payload: ActionDropDownStateType }
-  | { type: 'SET_EMAILS'; payload: string[] };
+  | { type: 'SET_EMAILS'; payload: string[] }
+  | { type: 'REMOVE_EMAIL'; payload: string}
+  | { type: 'SET_CURRENT_USER_EMAIL'; payload:string}
 
 export type ActionDropDownReducer = {
   state: ActionDropDownStateType;
@@ -79,4 +82,13 @@ export interface renameFileType {
   name: string;
   extension: string;
   path: string;
+}
+export interface updateFileUsersType{
+  fileId:string;
+  emails:string[];
+  path:string;
+}
+export interface toastErrorType{
+  messageJSX?:React.ReactNode;
+  message?:string;
 }
