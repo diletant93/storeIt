@@ -107,3 +107,4 @@ export interface createQueriesType{
   sort?:string;
   limit?:number;
 }
+export type FileType = 'document' | 'image' | 'video' | 'audio' | 'other';
