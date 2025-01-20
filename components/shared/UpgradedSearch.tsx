@@ -1,5 +1,6 @@
 "use client"
 import { Input } from "@/components_shadcn/ui/input";
+import { IFileType } from "@/types/types";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChangeEvent, useRef, useState } from "react";
@@ -8,8 +9,6 @@ export default function UpgradedSearch() {
     const [query, setQuery] = useState<string>('')
 
     const [isFocused, setIsFocused] = useState<boolean>(false)
-    
-
     const inputRef = useRef<HTMLInputElement>(null)
     const input = inputRef.current
 
