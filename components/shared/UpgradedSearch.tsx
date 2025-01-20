@@ -6,10 +6,17 @@ import { ChangeEvent, useRef, useState } from "react";
 
 export default function UpgradedSearch() {
     const [query, setQuery] = useState<string>('')
+
     const [isFocused, setIsFocused] = useState<boolean>(false)
+    
+
+    const inputRef = useRef<HTMLInputElement>(null)
+    const input = inputRef.current
+
     const seacrhParams = useSearchParams()
     const pathname = usePathname()
     const {replace} = useRouter()
+
     function handleSearch(value: string){
         setQuery(value)
         const params = new URLSearchParams(seacrhParams)
@@ -30,16 +37,19 @@ export default function UpgradedSearch() {
             width={24}
             height={24}
             className="absolute top-1/2 left-5 -translate-y-1/2 cursor-text"
-            onClick={()=>{setIsFocused(true)}}
+            onClick={()=>{
+                setIsFocused(true)
+                if(input) input.focus()
+            }}
           />)}
 
         <Input
+          ref={inputRef}
           onBlur={()=>{setIsFocused(false)}}
           onFocus={()=>{setIsFocused(true)}}
           value={query}
           onChange={(e:ChangeEvent<HTMLInputElement>) => {handleSearch(e.target.value)}}
-          defaultValue={seacrhParams.get('query')?.toString()}
-          className="focus:scale-105 transition-all duration-300 py-5 pl-8 rounded-xl"
+          className="focus:scale-105 transition-all duration-300 py-5 pl-3 rounded-xl"
         />
       </div>
     </div>
