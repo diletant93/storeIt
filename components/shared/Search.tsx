@@ -17,13 +17,14 @@ export default function Search() {
   const searchQuery = searchParams.get('query') || ''
 
   const [query, setQuery] = useState<string>('')
-  const [debouncedQuery] = useDebounce(query, 300)
+  const [debouncedQuery] = useDebounce(query, 200)
 
   const [results, setResults] = useState<IFileType[] | null>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const [isFocused, setIsFocused] = useState<boolean>(false)
+
   useEffect(() => {
     const fetchFiles = async () => {
       if (debouncedQuery.length === 0) {
@@ -38,45 +39,45 @@ export default function Search() {
     fetchFiles()
   }, [debouncedQuery])
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Enter') {
-
-      }
-    }
-    if (inputRef.current) {
-      inputRef.current.addEventListener('keydown', handleKeyDown)
-    }
-    return () => {
-      if (inputRef.current) {
-        inputRef.current.removeEventListener('keydown', handleKeyDown)
-      }
-    }
-  }, [query])
-
-  useEffect(() => {
     if (!searchQuery) {
       setQuery('')
       setIsOpen(false)
     }
   }, [searchQuery])
-  function handleRawFind() {
 
-  }
-  function handleResetSearchBar(){
-    setIsFocused(false)
-    setResults([])
-    setQuery('')
-  }
+  // useEffect(() => {
+  //   function handleKeyDown(e: KeyboardEvent) {
+  //     if (e.key === 'Enter') {
+
+  //     }
+  //   }
+  //   if (inputRef.current) {
+  //     inputRef.current.addEventListener('keydown', handleKeyDown)
+  //   }
+  //   return () => {
+  //     if (inputRef.current) {
+  //       inputRef.current.removeEventListener('keydown', handleKeyDown)
+  //     }
+  //   }
+  // }, [query])
+
+  // function handleRawFind() {
+
+  // }
+
   function handleClickItem(file: IFileType) {
     setIsOpen(false)
     setResults([])
+    
     const type = getProperType(file.type)
+    console.log(type)
+    console.log(`/${type}?query=${debouncedQuery}`)
     router.push(`/${type}?query=${debouncedQuery}`)
   }
   return (
     <div className="search">
       <div className="seacrh-input-wrapper">
-        {!isFocused && (<Image
+        {!isFocused && !query && (<Image
           src='/assets/icons/search.svg'
           alt="search"
           width={24} height={24}
@@ -85,7 +86,7 @@ export default function Search() {
 
         <Input ref={inputRef}
           onFocus={() => { setIsFocused(true) }}
-          onBlur={handleResetSearchBar}
+          onBlur={()=>{setIsFocused(false)}}
           value={query}
           onChange={(e) => { setQuery(e.target.value) }}
           className={`${!isFocused && ''} focus:scale-105 transition-all duration-300 py-5 rounded-xl`} />
