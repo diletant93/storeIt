@@ -18,7 +18,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
                 <Header accountId={currentUser.accountId} ownerId={currentUser.$id}/>
                 <div className="main-content">
                     {children}
-                    <PagePagination/>
                 </div>
             </section>
         </main>
