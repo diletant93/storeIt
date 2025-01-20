@@ -1,9 +1,6 @@
 import Loader from "@/components/elements/Loader";
-import Card from "@/components/shared/Card";
 import FileList from "@/components/shared/FileList";
 import Sort from "@/components/shared/Sort";
-import { getFiles } from "@/lib/actions/file.actions";
-import { getFileTypesParams, parseQueryString } from "@/lib/utils";
 import { SearchParamProps } from "@/types/props";
 import { Suspense } from "react";
 export default async function Page({ params, searchParams }: SearchParamProps) {

@@ -1,3 +1,4 @@
+import { constructPathType } from "@/types/types"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -284,4 +285,13 @@ export function getProperType(type:string){
     default:
       return type + 's'
   }
+}
+export function constructPath({sort,searchQuery, pathname}:constructPathType){
+  let result :string;
+  if(searchQuery){
+    result = `${pathname}?query=${searchQuery}&sort=${sort}`
+  }else{
+    result = `${pathname}?sort=${sort}`
+  }
+  return result
 }

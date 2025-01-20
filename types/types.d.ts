@@ -108,3 +108,8 @@ export interface createQueriesType{
   limit?:number;
 }
 export type FileType = 'document' | 'image' | 'video' | 'audio' | 'other';
+export type constructPathType = {
+  sort:string;
+  pathname:string;
+  searchQuery?:string;
+}

@@ -7,13 +7,19 @@ import {
   SelectValue,
 } from "@/components_shadcn/ui/select"
 import { sortTypes } from "@/constants";
-import { usePathname, useRouter } from "next/navigation";
+import { constructPath } from "@/lib/utils";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function Sort() {
   const router = useRouter()
   const pathname = usePathname()
+  const seacrhParams = useSearchParams()
+  const seacrhQuery = seacrhParams.get('query') || ''
+  console.log(seacrhQuery)
+  console.log(pathname)
   function handleSort(value: string) {
-    router.push(`${pathname}?sort=${value}`)
+    const path = constructPath({sort:value, searchQuery:seacrhQuery, pathname })
+    router.push(path)
   }
   return (
     <Select onValueChange={handleSort} defaultValue={sortTypes[0].value}>

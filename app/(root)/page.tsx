@@ -3,24 +3,24 @@ import Link from "next/link";
 import { Models } from "node-appwrite";
 
 import ActionDropdown from "@/components/shared/ActionDropDown";
-import  {Chart}  from "@/components/shared/Chart";
-import  FormattedDateTime  from "@/components/elements/FormattedDateTime";
-import  Thumbnail  from "@/components/elements/Thumbnail";
+import { Chart } from "@/components/shared/Chart";
+import FormattedDateTime from "@/components/elements/FormattedDateTime";
+import Thumbnail from "@/components/elements/Thumbnail";
 import { Separator } from "@/components_shadcn/ui/separator";
 import { getFiles, getTotalSpaceUsed } from "@/lib/actions/file.actions";
 import { convertFileSize, getUsageSummary } from "@/lib/utils";
 import { IFileType } from "@/types/types";
+import RecentFiles from "@/components/elements/RecentFiles";
+import { Suspense } from "react";
+import Loader from "@/components/elements/Loader";
 
 const Dashboard = async () => {
   // Parallel requests
-  const [files, totalSpace] = await Promise.all([
-    getFiles({limit: 10 }),
-    getTotalSpaceUsed(),
-  ]);
+  const totalSpace = await getTotalSpaceUsed()
 
   // Get usage summary
   const usageSummary = getUsageSummary(totalSpace);
-  if(!files) return <div className="dashboard-container"><Chart used={0}/></div>
+  if (totalSpace.used === 0) return <div className="dashboard-container"><Chart used={0} /></div>
   return (
     <div className="dashboard-container">
       <section>
@@ -61,39 +61,11 @@ const Dashboard = async () => {
       </section>
 
       {/* Recent files uploaded */}
-      <section className="dashboard-recent-files">
+      <section className="dashboard-recent-files relative">
         <h2 className="h3 xl:h2 text-light-100">Recent files uploaded</h2>
-        {files.length > 0 ? (
-          <ul className="mt-5 flex flex-col gap-5">
-            {files.map((file: IFileType) => (
-              <Link
-                href={file.url}
-                target="_blank"
-                className="flex items-center gap-3"
-                key={file.$id}
-              >
-                <Thumbnail
-                  type={file.type}
-                  extension={file.extension}
-                  url={file.url}
-                />
-
-                <div className="recent-file-details">
-                  <div className="flex flex-col gap-1">
-                    <p className="recent-file-name">{file.name}</p>
-                    <FormattedDateTime
-                      date={file.$createdAt}
-                      className="caption"
-                    />
-                  </div>
-                  <ActionDropdown file={file} />
-                </div>
-              </Link>
-            ))}
-          </ul>
-        ) : (
-          <p className="empty-list">No files uploaded</p>
-        )}
+        <Suspense fallback={<Loader/>}>
+          <RecentFiles />
+        </Suspense>
       </section>
     </div>
   );

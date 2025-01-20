@@ -1,3 +1,4 @@
 1) in the page we are fetching files every render for each page. 
 We need to fetch just once and all the other pages should use that
 2) fix the icon of each doc , it's a bit cut
+3) add total MB for each page
