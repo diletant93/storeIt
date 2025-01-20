@@ -90,6 +90,7 @@ export async function getFiles({
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
       queries,
+      
     );
 
     if (result.total <= 0) return null;

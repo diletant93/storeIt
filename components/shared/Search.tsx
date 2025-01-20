@@ -3,12 +3,12 @@ import { Input } from "@/components_shadcn/ui/input";
 import { getFiles } from "@/lib/actions/file.actions";
 import { IFileType } from "@/types/types";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import Thumbnail from "../elements/Thumbnail";
 import FormattedDateTime from "../elements/FormattedDateTime";
 import { getProperType } from "@/lib/utils";
-
+import { useDebounce } from 'use-debounce';
 export default function Search() {
   const [query, setQuery] = useState<string>('')
   const searchParams = useSearchParams()
@@ -16,30 +16,39 @@ export default function Search() {
   const router = useRouter()
   const [results, setResults] = useState<IFileType[] | null>([])
   const [isOpen , setIsOpen] = useState<boolean>(false)
+  const [debouncedQuery] = useDebounce(query,300)
+  const pathname = usePathname()
   useEffect( ()=>{
     const fetchFiles = async()=>{
-      const files = await getFiles({searchText:query})
+      if(debouncedQuery.length ===0){
+        setQuery('')
+        setIsOpen(false)
+        return router.push(pathname.replace(searchParams.toString(),''))
+      }
+      const files = await getFiles({searchText:debouncedQuery})
       setResults(files)
       setIsOpen(true)
     }
     fetchFiles()
-  },[query])
+  },[debouncedQuery])
+
   useEffect(()=>{
     if(!searchQuery){
       setQuery('')
+      setIsOpen(false)
     }
   },[searchQuery])
   function handleClickItem(file:IFileType){
     setIsOpen(false)
     setResults([])
     const type = getProperType(file.type)
-    router.push(`/${type}?query=${query}`)
+    router.push(`/${type}?query=${debouncedQuery}`)
   }
   return (
     <div className="search">
        <div className="seacrh-input-wrapper">
-        <Image src='/assets/icons/search.svg' alt="search" width={24} height={24}/>
-        <Input value={query} onChange={(e) => {setQuery(e.target.value)}}/>
+        <Image src='/assets/icons/search.svg' alt="search" width={24} height={24} className="absolute top-1/2 left-1 -translate-y-1/2"/>
+        <Input value={query} onChange={(e) => {setQuery(e.target.value)}} className="pl-8"/>
        </div>
        {isOpen &&(
         <ul className="search-result">
