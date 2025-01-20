@@ -41,7 +41,7 @@ export default function Search({params}:{params?:Promise<string|null>}) {
       if (debouncedQuery.length === 0) {
         setResults([]);
         setIsOpen(false);
-        return router.push(pathname.replace(searchParams.toString(), ""));
+        if(isSearching) return router.push(pathname.replace(searchParams.toString(), ""));
       }
       if (debouncedQuery.length > 0 && !isEntered && isSearching) {
         console.log({isEntered,isSearching, length: debouncedQuery.length})

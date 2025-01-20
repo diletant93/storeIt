@@ -5,11 +5,12 @@ import FileUploader from "./FileUploader";
 import SignOutButton from "../elements/SignOutButton";
 import { signOut } from "@/lib/actions/user.actions";
 import { HeaderProps } from "@/types/props";
+import UpgradedSearch from "./UpgradedSearch";
 
 export default function Header({accountId, ownerId}:HeaderProps) {
   return (
     <header className="header">
-       <Search/>
+       <UpgradedSearch/>
        <div className="header-wrapper">
             <FileUploader accountId={accountId} ownerId={ownerId}/>
             <form action={async() =>{

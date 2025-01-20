@@ -75,6 +75,7 @@ export async function getFiles({
   searchText = '',
   sort = '$createdAt-desc',
   limit = 10,
+  page = 1
 }: getFilesType) {
   try {
     const { databases } = await createAdminClient();
@@ -106,8 +107,9 @@ function createQueries({
   currentUser,
   types,
   sort='$createdAt-desc',
-  limit,
+  limit=10,
   searchText,
+  page=1 
 }: createQueriesType) {
   const queries = [
     Query.or([
@@ -119,7 +121,6 @@ function createQueries({
      queries.push(Query.equal('type', types));
   }
   if (searchText) queries.push(Query.contains('name', searchText));
-  if (limit) queries.push(Query.limit(limit));
   if (sort) {
     console.log(sort)
     const [sortBy, orderBy] = sort.split('-');
@@ -127,6 +128,9 @@ function createQueries({
       orderBy === 'asc' ? Query.orderAsc(sortBy) : Query.orderDesc(sortBy),
     );
   }
+  const skip = (page - 1) * limit
+  queries.push(Query.offset(skip),Query.limit(limit)
+)
   return queries;
 }
 export async function renameFile({

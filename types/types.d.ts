@@ -99,6 +99,7 @@ export interface getFilesType{
   searchText?:string;
   sort?:string;
   limit?:number;
+  page?:number;
 }
 export interface createQueriesType{
   currentUser: IUserType,
@@ -106,6 +107,7 @@ export interface createQueriesType{
   searchText?:string;
   sort?:string;
   limit?:number;
+  page?:number
 }
 export type FileType = 'document' | 'image' | 'video' | 'audio' | 'other';
 export type constructPathType = {
