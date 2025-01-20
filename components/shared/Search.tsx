@@ -88,15 +88,15 @@ export default function Search() {
           onBlur={handleResetSearchBar}
           value={query}
           onChange={(e) => { setQuery(e.target.value) }}
-          className={`${!isFocused && ''}`} />
+          className={`${!isFocused && ''} focus:scale-105 transition-all duration-300 py-5 rounded-xl`} />
 
       </div>
       {isOpen && (
         <ul className="search-result">
           {results ? (
             results.map((file) => (
-              <li className="flex items-center justify-between" key={file.$id} onClick={() => { handleClickItem(file) }}>
-                <div className="flex cursor-pointer items-center gap-4">
+              <li className="flex items-center justify-between hover:bg-slate-50 rounded-xl px-1" key={file.$id} onClick={() => { handleClickItem(file) }}>
+                <div className="flex cursor-pointer items-center gap-4 ">
                   <Thumbnail type={file.type} extension={file.extension} url={file.url} className="size-9 min-w-9" />
                   <p className="subtitle-2 line-clamp-1 text-light-100 mb-1">
                     {file.name}

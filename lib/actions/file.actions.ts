@@ -14,7 +14,7 @@ import {
 import { createAdminClient, createSessionClient } from '../appwrite';
 import { InputFile } from 'node-appwrite/file';
 import { appwriteConfig } from '../appwrite/config';
-import { ID, Models, Query } from 'node-appwrite';
+import { ID, Query } from 'node-appwrite';
 import { constructFileUrl, getFileType, parseStringify } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from './user.actions';
@@ -115,7 +115,9 @@ function createQueries({
       Query.contains('users', currentUser.email),
     ]),
   ];
-  if (types) queries.push(Query.equal('type', types));
+  if (types && !types.includes('all')){
+     queries.push(Query.equal('type', types));
+  }
   if (searchText) queries.push(Query.contains('name', searchText));
   if (limit) queries.push(Query.limit(limit));
   if (sort) {

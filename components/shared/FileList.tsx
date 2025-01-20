@@ -14,17 +14,13 @@ export default async function FileList({ type, searchParams }: FilesProps) {
     return (
         <>
         {
-            files.length > 0 ? (
+            files.length > 0 && (
                 <section className="file-list">
                     {(files as IFileType[]).map((file: IFileType) => (
                         <Card file={file} key={file.$id} />
                     ))}
                 </section>
-            ) : (
-                <section>
-
-                </section>
-            )
+            ) 
         }
         </>
     );
