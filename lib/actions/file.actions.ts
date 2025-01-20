@@ -18,6 +18,7 @@ import { constructFileUrl, getFileType, parseStringify } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from './user.actions';
 import { redirect } from 'next/navigation';
+import { TYPES } from '@/constants';
 export async function uploadFile({
   file,
   ownerId,
@@ -69,7 +70,7 @@ export async function uploadFile({
 }
 
 export async function getFiles({
-  types,
+  types=TYPES,
   searchText = '',
   sort = '$createdAt-desc',
   limit = 10,

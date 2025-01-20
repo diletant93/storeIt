@@ -95,7 +95,7 @@ export interface deleteFileType{
   path:string;
 }
 export interface getFilesType{
-  types:string[];
+  types?:string[];
   searchText?:string;
   sort?:string;
   limit?:number;

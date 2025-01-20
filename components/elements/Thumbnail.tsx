@@ -11,7 +11,7 @@ export default function Thumbnail({ type, extension, imageClassName, className, 
         alt="thunbail"
         width={100}
         height={100}
-        className={cn('size-8 object-contain -translate-x-0.5', imageClassName, isImage && 'thumbnail-image')} />
+        className={cn('size-8 object-contain', imageClassName, isImage && 'thumbnail-image')} />
     </figure>
   );
 }

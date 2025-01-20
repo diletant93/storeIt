@@ -274,3 +274,14 @@ export function parseQueryString(queryString: string) {
 
   return result;
 }
+
+export function getProperType(type:string){
+  switch(type){
+    case 'video':
+      return 'media'
+    case 'audio':
+      return 'audio'
+    default:
+      return type + 's'
+  }
+}
