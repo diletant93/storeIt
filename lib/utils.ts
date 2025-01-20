@@ -1,3 +1,4 @@
+import { PAGES_TYPES, TYPES } from "@/constants"
 import { constructPathType } from "@/types/types"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
@@ -276,14 +277,14 @@ export function parseQueryString(queryString: string) {
   return result;
 }
 
-export function getProperType(type:string){
+export function getProperType(type:string):string[]{
   switch(type){
     case 'video':
-      return 'media'
+      return ['media']
     case 'audio':
-      return 'audio'
+      return ['audio']
     default:
-      return type + 's'
+      return [type + 's']
   }
 }
 export function constructPath({sort,searchQuery, pathname}:constructPathType){
@@ -294,4 +295,10 @@ export function constructPath({sort,searchQuery, pathname}:constructPathType){
     result = `${pathname}?sort=${sort}`
   }
   return result
+}
+export function getFirstPathSegment(pathname: string): string {
+  const [path] = pathname.split('?'); // Remove the query string
+  console.log(path)
+  const segments = path.split('/').filter(Boolean); 
+  return PAGES_TYPES.includes(segments[0])? segments[0] : 'all'; 
 }

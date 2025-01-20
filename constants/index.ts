@@ -92,3 +92,4 @@ export const SESSION_NAME = 'appwrite-session';
 export const EXTENSIONS =
   /\.(aac|mp3|wav|flac|ogg|m4a|mp4|mkv|mov|avi|wmv|flv|webm|jpg|jpeg|png|gif|bmp|svg|pdf|doc|docx|ppt|pptx|xls|xlsx|txt|rtf|zip|rar|7z|tar|gz|iso|html|css|js|ts|json|xml|php|py|java|cpp|c)$/i;
 export const TYPES = ['document','audio','video','image','other']
+export const PAGES_TYPES = ['documents','images','media','others','all']
