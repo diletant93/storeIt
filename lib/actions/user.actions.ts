@@ -36,7 +36,7 @@ export async function createAccount({ fullName, email }: createAccountType) {
 
   const existingUser = await getUserByEmail(email);
   if (existingUser)
-    handleError(new Error('User already exists'), 'User already exists');
+    return null
 
   const accountId = await sendEmailOTP({ email });
   if (!accountId)
