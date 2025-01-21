@@ -1,4 +1,3 @@
-import PagePagination from "@/components/elements/PagePagination";
 import Header from "@/components/shared/Header";
 import MobileNavigation from "@/components/shared/MobileNavigation";
 import Sidebar from "@/components/shared/Sidebar";
