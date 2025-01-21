@@ -10,15 +10,13 @@ import { sortTypes } from "@/constants";
 import { constructPath } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export default function Sort() {
+export default function Sort({searchParams} :{searchParams?:Promise<{[key:string]:string| string[]|undefined}>}) {
   const router = useRouter()
   const pathname = usePathname()
   const seacrhParams = useSearchParams()
-  const seacrhQuery = seacrhParams.get('query') || ''
-  console.log(seacrhQuery)
-  console.log(pathname)
+  const searchQuery = seacrhParams.toString()
   function handleSort(value: string) {
-    const path = constructPath({sort:value, searchQuery:seacrhQuery, pathname })
+    const path = constructPath({paramName:'sort', paramValue:value ,searchQuery, pathname })
     router.push(path)
   }
   return (

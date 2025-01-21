@@ -15,7 +15,7 @@ import { createAdminClient, createSessionClient } from '../appwrite';
 import { InputFile } from 'node-appwrite/file';
 import { appwriteConfig } from '../appwrite/config';
 import { ID, Query } from 'node-appwrite';
-import { constructFileUrl, getFileType, parseStringify } from '../utils';
+import { constructFileUrl, convertFileSize, getFileType, parseStringify } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from './user.actions';
 import { redirect } from 'next/navigation';
@@ -69,13 +69,39 @@ export async function uploadFile({
     throw error;
   }
 }
+export async function getTotalSize({types}:{types:string[]}){
+  try{
+    const { databases } = await createAdminClient();
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return redirect('/sign-in');
+    console.log('types:',types)
+    const queries = [
+      Query.or([
+        Query.equal('owner', currentUser.$id),
+        Query.contains('users', currentUser.email),
+      ]),
+    ];
+    
+    if(!types.includes('all')) queries.push(Query.equal('type',types))
 
+    const result = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.filesColectionId,
+      queries,
+    );
+    console.log('results:',result)
+    if(result.total <=0) return 0
+    const totalSize = result.documents.reduce((acc, next) => acc += next.size, 0)
+    return convertFileSize(totalSize)
+  }catch(error){
+    console.log(error)
+    throw error
+  }
+}
 export async function getFiles({
   types=TYPES,
   searchText = '',
   sort = '$createdAt-desc',
-  limit = 10,
-  page = 1
 }: getFilesType) {
   try {
     const { databases } = await createAdminClient();
@@ -86,8 +112,6 @@ export async function getFiles({
       types,
       searchText,
       sort,
-      limit,
-      page,
     });
     const result = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -97,7 +121,6 @@ export async function getFiles({
     );
 
     if (result.total <= 0) return null;
-    if(page*limit > result.total) return null;
     return result.documents as IFileType[];
   } catch (error) {
     console.log(error);
@@ -108,9 +131,7 @@ function createQueries({
   currentUser,
   types,
   sort='$createdAt-desc',
-  limit=10,
   searchText,
-  page=1 
 }: createQueriesType) {
   const queries = [
     Query.or([
@@ -129,9 +150,6 @@ function createQueries({
       orderBy === 'asc' ? Query.orderAsc(sortBy) : Query.orderDesc(sortBy),
     );
   }
-  const skip = (page - 1) * limit
-  queries.push(Query.offset(skip),Query.limit(limit)
-)
   return queries;
 }
 export async function renameFile({

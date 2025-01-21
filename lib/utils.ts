@@ -294,21 +294,44 @@ export function getProperType(type: string): string[] {
       return ['media'];
     case 'audio':
       return ['audio'];
+      case 'all':
+        return ['all']
     default:
       return [type + 's'];
   }
 }
 export function constructPath({
-  sort,
+  paramName,
+  paramValue,
   searchQuery,
   pathname,
-}: constructPathType) {
+}: {
+  paramName: string;
+  paramValue: string;
+  searchQuery?: string;
+  pathname: string;
+}) {
   let result: string;
+
+  // Initialize the base path
   if (searchQuery) {
-    result = `${pathname}?query=${searchQuery}&sort=${sort}`;
+    result = `${pathname}?${searchQuery}`;
   } else {
-    result = `${pathname}?sort=${sort}`;
+    result = pathname;
   }
+
+  // Create a dynamic regex to match the given param name
+  const paramRegex = new RegExp(`[?&]${paramName}=[^&]*`);
+
+  // Check if the parameter already exists
+  if (paramRegex.test(result)) {
+    // Replace the existing parameter value
+    result = result.replace(paramRegex, match => `${match[0]}${paramName}=${paramValue}`);
+  } else {
+    // Append the parameter depending on the presence of "?"
+    result += result.includes('?') ? `&${paramName}=${paramValue}` : `?${paramName}=${paramValue}`;
+  }
+
   return result;
 }
 export function getFirstPathSegment(pathname: string): string {
