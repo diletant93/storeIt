@@ -8,7 +8,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 export function handleError(error: unknown, message: string) {
-  console.log(message);
   throw error;
 }
 export function parseStringify(value: unknown) {
@@ -336,7 +335,6 @@ export function constructPath({
 }
 export function getFirstPathSegment(pathname: string): string {
   const [path] = pathname.split('?'); // Remove the query string
-  console.log(path);
   const segments = path.split('/').filter(Boolean);
   return PAGES_TYPES.includes(segments[0]) ? segments[0] : 'all';
 }

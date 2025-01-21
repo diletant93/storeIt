@@ -66,7 +66,6 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
         } catch (error) {
             dispatch({ type: 'SET_IS_LOADING', payload: false })
             if (error instanceof Error) {
-                console.log('inside the toasts')
                 return toastError({ message: error.message })
             }
             return toastError({ message: 'Something went wrong' })
@@ -81,8 +80,6 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
         if (!state.action) return
         dispatch({ type: 'SET_IS_LOADING', payload: true })
         let success: unknown;
-        console.log('handling action:',state.action)
-        console.log('emails in handling action:',state.emails)
         const actions = {
             rename: () => renameFile({ fileId: file.$id, name: state.name, extension: file.extension, path: pathname }),
             share: () => updateFileUsers({ fileId: file.$id, emails: state.emails, path: pathname }),
@@ -90,11 +87,9 @@ export default function ActionDropDown({ file }: { file: IFileType }) {
         }
         try {
             success = await actions[state.action.value as keyof typeof actions]()
-            console.log('success:',success)
         } catch (error) {
             dispatch({ type: 'SET_IS_LOADING', payload: false })
             if (error instanceof Error) {
-                console.log('inside the toasts')
                 return toastError({ message: error.message })
             }
             return toastError({ message: 'Something went wrong' })

@@ -15,7 +15,12 @@ import { createAdminClient, createSessionClient } from '../appwrite';
 import { InputFile } from 'node-appwrite/file';
 import { appwriteConfig } from '../appwrite/config';
 import { ID, Query } from 'node-appwrite';
-import { constructFileUrl, convertFileSize, getFileType, parseStringify } from '../utils';
+import {
+  constructFileUrl,
+  convertFileSize,
+  getFileType,
+  parseStringify,
+} from '../utils';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from './user.actions';
 import { redirect } from 'next/navigation';
@@ -65,16 +70,14 @@ export async function uploadFile({
     revalidatePath(path);
     return parseStringify(newFile);
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
-export async function getTotalSize({types}:{types:string[]}){
-  try{
+export async function getTotalSize({ types }: { types: string[] }) {
+  try {
     const { databases } = await createAdminClient();
     const currentUser = await getCurrentUser();
     if (!currentUser) return redirect('/sign-in');
-    console.log('types:',types)
     const queries = [
       Query.or([
         Query.equal('owner', currentUser.$id),
@@ -82,24 +85,25 @@ export async function getTotalSize({types}:{types:string[]}){
       ]),
     ];
 
-    if(!types.includes('all')) queries.push(Query.equal('type',types))
+    if (!types.includes('all')) queries.push(Query.equal('type', types));
 
     const result = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
       queries,
     );
-    console.log('results:',result)
-    if(result.total <=0) return 0
-    const totalSize = result.documents.reduce((acc, next) => acc += next.size, 0)
-    return convertFileSize(totalSize)
-  }catch(error){
-    console.log(error)
-    throw error
+    if (result.total <= 0) return 0;
+    const totalSize = result.documents.reduce(
+      (acc, next) => (acc += next.size),
+      0,
+    );
+    return convertFileSize(totalSize);
+  } catch (error) {
+    throw error;
   }
 }
 export async function getFiles({
-  types=TYPES,
+  types = TYPES,
   searchText = '',
   sort = '$createdAt-desc',
 }: getFilesType) {
@@ -117,20 +121,18 @@ export async function getFiles({
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
       queries,
-      
     );
 
     if (result.total <= 0) return null;
     return result.documents as IFileType[];
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
 function createQueries({
   currentUser,
   types,
-  sort='$createdAt-desc',
+  sort = '$createdAt-desc',
   searchText,
 }: createQueriesType) {
   const queries = [
@@ -139,12 +141,11 @@ function createQueries({
       Query.contains('users', currentUser.email),
     ]),
   ];
-  if (types && !types.includes('all')){
-     queries.push(Query.equal('type', types));
+  if (types && !types.includes('all')) {
+    queries.push(Query.equal('type', types));
   }
   if (searchText) queries.push(Query.contains('name', searchText));
   if (sort) {
-    console.log(sort)
     const [sortBy, orderBy] = sort.split('-');
     queries.push(
       orderBy === 'asc' ? Query.orderAsc(sortBy) : Query.orderDesc(sortBy),
@@ -172,7 +173,6 @@ export async function renameFile({
     revalidatePath(path);
     return updatedFile;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
@@ -182,12 +182,11 @@ export async function updateFileUsers({
   emails,
   path,
 }: updateFileUsersType) {
-  console.log('inside update');
   try {
     const { databases } = await createAdminClient();
-    console.log('emails:',emails)
     const allValuesExist = await isAvailableEmails(emails);
-    if (!allValuesExist || emails.length === 0) throw new Error('You entered an unexisting email');
+    if (!allValuesExist || emails.length === 0)
+      throw new Error('You entered an unexisting email');
 
     const isOwnEmail = await isEnteredOwnEmail(emails);
     if (isOwnEmail) {
@@ -205,7 +204,6 @@ export async function updateFileUsers({
     revalidatePath(path);
     return updatedFile;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
@@ -227,11 +225,8 @@ async function isAvailableEmails(emails: string[]) {
       availableEmailSet.has(email),
     );
 
-    console.log(allValuesExist);
-
     return allValuesExist;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
@@ -239,10 +234,8 @@ async function isEnteredOwnEmail(emails: string[]) {
   try {
     const currentUser = await getCurrentUser();
     const emailsSet = new Set(emails);
-    console.log('emailSet:', emailsSet);
     return emailsSet.has(currentUser!.email);
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
@@ -260,7 +253,6 @@ export async function deleteFile({ file, path }: deleteFileType) {
 
     revalidatePath(path);
   } catch (error) {
-    console.log(error);
     throw error;
   }
 }
@@ -268,20 +260,20 @@ export async function getTotalSpaceUsed() {
   try {
     const { databases } = await createSessionClient();
     const currentUser = await getCurrentUser();
-    if (!currentUser) throw new Error("User is not authenticated.");
+    if (!currentUser) throw new Error('User is not authenticated.');
 
     const files = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.filesColectionId,
-      [Query.equal("owner", [currentUser.$id])],
+      [Query.equal('owner', [currentUser.$id])],
     );
 
     const totalSpace = {
-      image: { size: 0, latestDate: "" },
-      document: { size: 0, latestDate: "" },
-      video: { size: 0, latestDate: "" },
-      audio: { size: 0, latestDate: "" },
-      other: { size: 0, latestDate: "" },
+      image: { size: 0, latestDate: '' },
+      document: { size: 0, latestDate: '' },
+      video: { size: 0, latestDate: '' },
+      audio: { size: 0, latestDate: '' },
+      other: { size: 0, latestDate: '' },
       used: 0,
       all: 2 * 1024 * 1024 * 1024 /* 2GB available bucket storage */,
     };
@@ -301,7 +293,6 @@ export async function getTotalSpaceUsed() {
 
     return parseStringify(totalSpace);
   } catch (error) {
-   console.log(error)
-   throw error
+    throw error;
   }
 }

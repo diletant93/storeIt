@@ -29,14 +29,12 @@ export default function page({ type }: { type: FormTypeProp }) {
   const authScheme = getAuthFormValidationScheme(type)
   const defaultValues = type === 'sign-up' ? { fullName: '', email: '' } : { email: '' }
 
-  console.log(defaultValues)
   const form = useForm<AuthFormType>({
     resolver: zodResolver(authScheme),
     defaultValues:defaultValues as z.infer<typeof authScheme>,
     mode:'onChange'
   })
   async function onSubmit(values: z.infer<typeof authScheme>) {
-    console.log('submitted', values)
     setIsLoading(true)
     setErrorMessage('')
     try {
@@ -104,7 +102,7 @@ export default function page({ type }: { type: FormTypeProp }) {
                 </FormItem>
               )}
             />
-              <Button type="submit" className="form-submit-button" disabled={isLoading} onClick={()=>{console.log('clicked')}} >
+              <Button type="submit" className="form-submit-button" disabled={isLoading} >
                 {isLoading && (
                   <Image
                     src='/assets/icons/loader.svg'
