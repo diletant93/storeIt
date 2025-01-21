@@ -40,7 +40,7 @@ export default function page({ type }: { type: FormTypeProp }) {
     setIsLoading(true)
     setErrorMessage('')
     try {
-      let user : {accountId:string} | null  = null;
+      let user : {accountId:string} | null | {error:string}  = null;
       
       if('fullName' in values){
          user = await createAccount({
@@ -51,11 +51,10 @@ export default function page({ type }: { type: FormTypeProp }) {
          user = await signIn({email:values.email})
       }
 
-      if(user){
+      if(user && 'accountId' in user){
         setAccountId(user.accountId as string)
-      }
-      if(!user){
-        setErrorMessage('Account user already exists')
+      }else{
+        setErrorMessage(user!.error)
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

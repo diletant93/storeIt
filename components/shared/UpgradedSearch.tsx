@@ -1,6 +1,5 @@
 "use client"
 import { Input } from "@/components_shadcn/ui/input";
-import { IFileType } from "@/types/types";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChangeEvent, useRef, useState } from "react";
@@ -30,7 +29,7 @@ export default function UpgradedSearch() {
   return (
     <div className="search">
       <div className="search-input-wrapper relative">
-         {!isFocused && ( <Image
+         {!isFocused && !query && ( <Image
             src="/assets/icons/search.svg"
             alt="search"
             width={24}

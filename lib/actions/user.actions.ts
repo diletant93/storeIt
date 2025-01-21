@@ -36,7 +36,7 @@ export async function createAccount({ fullName, email }: createAccountType) {
 
   const existingUser = await getUserByEmail(email);
   if (existingUser)
-    return null
+    return {error:'Such a user already exists'}
 
   const accountId = await sendEmailOTP({ email });
   if (!accountId)
@@ -112,7 +112,7 @@ export async function signIn({ email }: { email: string }) {
   try {
     const existingUser = await getUserByEmail(email);
     if (!existingUser)
-      return parseStringify({ accountId: null, error: 'User was not found' });
+      return {error:'Such an email does not exist'}
     await sendEmailOTP({ email });
     return parseStringify({ accountId: existingUser.accountId });
   } catch (error) {
