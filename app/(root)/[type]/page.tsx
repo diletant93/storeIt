@@ -1,6 +1,8 @@
 import Loader from "@/components/elements/Loader";
+import PagePagination from "@/components/elements/PagePagination";
 import FileList from "@/components/shared/FileList";
 import Sort from "@/components/shared/Sort";
+import { Pagination } from "@/components_shadcn/ui/pagination";
 import { SearchParamProps } from "@/types/props";
 import { Suspense } from "react";
 export default async function Page({ params, searchParams }: SearchParamProps) {
@@ -12,13 +14,14 @@ export default async function Page({ params, searchParams }: SearchParamProps) {
                     {type}
                 </h1>
                 <div className="total-size-section">
-                    <p className="body-1">
+                    <p className="body-1 min-w-[5rem]">
                         Total: <span className="h5">
                             0 MB
                         </span>
                     </p>
+                    <PagePagination/>
                     <div className="sort-container">
-                        <p className="body-1 hidden sm:block text-light-200">
+                        <p className="body-1 hidden sm:block text-light-200 min-w-[5rem]">
                             Sort by:
                         </p>
                         <Sort />

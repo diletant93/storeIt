@@ -87,6 +87,7 @@ export async function getFiles({
       searchText,
       sort,
       limit,
+      page,
     });
     const result = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -96,7 +97,7 @@ export async function getFiles({
     );
 
     if (result.total <= 0) return null;
-
+    if(page*limit > result.total) return null;
     return result.documents as IFileType[];
   } catch (error) {
     console.log(error);

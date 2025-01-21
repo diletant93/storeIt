@@ -1,17 +1,18 @@
-import { PAGES_TYPES, TYPES } from "@/constants"
-import { constructPathType } from "@/types/types"
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { PAGES_TYPES, TYPES } from '@/constants';
+import { toast } from '@/hooks/use-toast';
+import { constructPathType } from '@/types/types';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
-export function handleError(error : unknown, message : string){
-    console.log(message)
-    throw error
+export function handleError(error: unknown, message: string) {
+  console.log(message);
+  throw error;
 }
-export function parseStringify(value: unknown){
-  return JSON.parse(JSON.stringify(value) )
+export function parseStringify(value: unknown) {
+  return JSON.parse(JSON.stringify(value));
 }
 
 export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
@@ -125,7 +126,7 @@ export const formatDateTime = (isoString: string | null | undefined) => {
 
 export const getFileIcon = (
   extension: string | undefined,
-  type:   string, //here must be a FileType
+  type: string, //here must be a FileType
 ) => {
   switch (extension) {
     // Document
@@ -247,7 +248,12 @@ export const getFileTypesParams = (type: string) => {
   }
 };
 export function parseQueryString(queryString: string) {
-  const result: { searchText?: string; sort?: string; limit?: number } = {};
+  const result: {
+    searchText?: string;
+    sort?: string;
+    limit?: number;
+    page?: number;
+  } = {};
 
   // Ensure the query string is not empty
   if (!queryString || queryString.trim() === '') {
@@ -262,7 +268,7 @@ export function parseQueryString(queryString: string) {
     result.searchText = parts[0];
   }
 
-  // Process the remaining parts (e.g., sort and limit)
+  // Process the remaining parts (e.g., sort, limit, page, pageSize)
   parts.slice(1).forEach((part) => {
     if (part.startsWith('sort=')) {
       result.sort = part.replace('sort=', '');
@@ -271,34 +277,43 @@ export function parseQueryString(queryString: string) {
       if (!isNaN(limitValue)) {
         result.limit = limitValue;
       }
+    } else if (part.startsWith('page=')) {
+      const pageValue = parseInt(part.replace('page=', ''), 10);
+      if (!isNaN(pageValue)) {
+        result.page = pageValue;
+      }
     }
   });
 
   return result;
 }
 
-export function getProperType(type:string):string[]{
-  switch(type){
+export function getProperType(type: string): string[] {
+  switch (type) {
     case 'video':
-      return ['media']
+      return ['media'];
     case 'audio':
-      return ['audio']
+      return ['audio'];
     default:
-      return [type + 's']
+      return [type + 's'];
   }
 }
-export function constructPath({sort,searchQuery, pathname}:constructPathType){
-  let result :string;
-  if(searchQuery){
-    result = `${pathname}?query=${searchQuery}&sort=${sort}`
-  }else{
-    result = `${pathname}?sort=${sort}`
+export function constructPath({
+  sort,
+  searchQuery,
+  pathname,
+}: constructPathType) {
+  let result: string;
+  if (searchQuery) {
+    result = `${pathname}?query=${searchQuery}&sort=${sort}`;
+  } else {
+    result = `${pathname}?sort=${sort}`;
   }
-  return result
+  return result;
 }
 export function getFirstPathSegment(pathname: string): string {
   const [path] = pathname.split('?'); // Remove the query string
-  console.log(path)
-  const segments = path.split('/').filter(Boolean); 
-  return PAGES_TYPES.includes(segments[0])? segments[0] : 'all'; 
+  console.log(path);
+  const segments = path.split('/').filter(Boolean);
+  return PAGES_TYPES.includes(segments[0]) ? segments[0] : 'all';
 }

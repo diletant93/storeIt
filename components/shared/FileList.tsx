@@ -4,13 +4,13 @@ import { getFiles } from "@/lib/actions/file.actions";
 import { FilesProps } from "@/types/props";
 import { getFileTypesParams, parseQueryString } from "@/lib/utils";
 
+
 export default async function FileList({ type, searchParams }: FilesProps) {
     const searchQueryString = ((await searchParams)?.query) as string
-    const sort = ((await searchParams)?.sort) as string
-    const {searchText, limit} =parseQueryString(searchQueryString)
+    const {searchText, sort, limit, page} = parseQueryString(searchQueryString)
     const types = getFileTypesParams(type)
-    const files = await getFiles({types,searchText,sort,limit})
-    if(!files) return null
+    const files = await getFiles({searchText, sort, limit, page,types} )
+    if(!files) return <p className="absolute top-[54%] left-[58%] text-brand ">No files</p>
     return (
         <>
         {

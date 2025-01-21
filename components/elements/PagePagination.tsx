@@ -7,22 +7,26 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components_shadcn/ui/pagination"
+import { parseQueryString } from "@/lib/utils";
 
-export default function PagePagination() {
+export default async function PagePagination({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
+    const searchQuery = ((await searchParams)?.query?.toString()) || ''
+    const page = await parseQueryString(searchQuery).page || 1
+    
     return (
-        <Pagination>
+        <Pagination className="hidden lg:flex">
             <PaginationContent>
                 <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious href="#" className="hover:bg-slate-200" />
                 </PaginationItem>
                 <PaginationItem>
-                    <PaginationLink href="#">1</PaginationLink>
+                    <PaginationLink href="#" className="text-brand">{page}</PaginationLink>
                 </PaginationItem>
                 <PaginationItem>
                     <PaginationEllipsis />
                 </PaginationItem>
                 <PaginationItem>
-                    <PaginationNext href="#" />
+                    <PaginationNext href="#" className="hover:bg-slate-200" />
                 </PaginationItem>
             </PaginationContent>
         </Pagination>

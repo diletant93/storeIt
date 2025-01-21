@@ -1,5 +1,5 @@
 import { toastErrorType } from '@/types/types';
-import { useToast } from './use-toast';
+import { toast, useToast } from './use-toast';
 
 export default function useErrorToast() {
   const { toast } = useToast();
@@ -23,4 +23,7 @@ export default function useErrorToast() {
     })
   }
   return { toastError }
+}
+export function toastError(message:string){
+  return  toast({description:(<p className='body-2 text-white'>{message}</p>), className:'error-toast'})
 }
