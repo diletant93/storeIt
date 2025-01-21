@@ -28,7 +28,6 @@ export default function page({ type }: { type: FormTypeProp }) {
 
   const authScheme = getAuthFormValidationScheme(type)
   const defaultValues = type === 'sign-up' ? { fullName: '', email: '' } : { email: '' }
-
   const form = useForm<AuthFormType>({
     resolver: zodResolver(authScheme),
     defaultValues:defaultValues as z.infer<typeof authScheme>,
@@ -37,20 +36,20 @@ export default function page({ type }: { type: FormTypeProp }) {
   async function onSubmit(values: z.infer<typeof authScheme>) {
     setIsLoading(true)
     setErrorMessage('')
+    console.log('email:',values.email)
     try {
       let user : {accountId:string} | null | {error:string}  = null;
-      
       if('fullName' in values){
-         user = await createAccount({
+        user = await createAccount({
           fullName: (values.fullName) as string || '',
           email: values.email
         })
       }else{
-         user = await signIn({email:values.email})
+        user = await signIn({email:values.email})
       }
-
+      
       if(user && 'accountId' in user){
-        setAccountId(user.accountId as string)
+        setAccountId( user.accountId as string)
       }else{
         setErrorMessage(user!.error)
       }
@@ -131,8 +130,9 @@ export default function page({ type }: { type: FormTypeProp }) {
           </form>
         </Form>
         {accountId && (
-            <OTPModal email={form.getValues('email')} accountId={accountId}/>
+            <OTPModal email={form.getValues('email')} accountId={accountId} setAccountIdNone={()=>{setAccountId('')}} type={type}/>
         )}
+        {}
 
     </>
   );

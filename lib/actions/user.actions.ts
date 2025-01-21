@@ -11,7 +11,9 @@ import { redirect } from 'next/navigation';
 
 async function getUserByEmail(email: string) {
   try {
+    console.log('inside user by email')
     const { databases } = await createAdminClient();
+    console.log('inside user by email email:',email)
     const result = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersColectionId,
@@ -56,7 +58,29 @@ export async function createAccount({ fullName, email }: createAccountType) {
   );
   return parseStringify({ accountId });
 }
-
+export async function cleanUser({email}:{email:string}){
+  try {
+    console.log('inside cleanUser')
+    const {databases,users} = await createAdminClient()
+    console.log('inside db')
+    const user = await getUserByEmail(email)
+    console.log('inside user:',user)
+    if(user) {
+      const deleteAcc = await users.delete(user.accountId)
+      console.log('deletedAcc', deleteAcc)
+      const deleted = await databases.deleteDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.usersColectionId,
+        user.$id
+      )
+      console.log('deleted:',deleted)
+      return null
+    }
+    return {error:'smth went wrong while cleaning the user'}
+  } catch (error) {
+    return {error:'smth went wrong while cleaningdasda the user'}
+  }
+}
 export async function verifySecretCode({
   accountId,
   password,
