@@ -81,7 +81,7 @@ export async function getTotalSize({types}:{types:string[]}){
         Query.contains('users', currentUser.email),
       ]),
     ];
-    
+
     if(!types.includes('all')) queries.push(Query.equal('type',types))
 
     const result = await databases.listDocuments(
@@ -185,15 +185,12 @@ export async function updateFileUsers({
   console.log('inside update');
   try {
     const { databases } = await createAdminClient();
-    console.log('emails:', emails);
+    console.log('emails:',emails)
     const allValuesExist = await isAvailableEmails(emails);
-    console.log('allValuesExist:', allValuesExist);
-    if (!allValuesExist) throw new Error('You entered an unexisting email');
+    if (!allValuesExist || emails.length === 0) throw new Error('You entered an unexisting email');
 
     const isOwnEmail = await isEnteredOwnEmail(emails);
-    console.log('isOwnEmail', isOwnEmail);
     if (isOwnEmail) {
-      console.log('inside throwing an error own email');
       throw new Error('You entered your own email');
     }
 
